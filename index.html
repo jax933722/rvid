@@ -3,791 +3,673 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RVID — Ultimate AI Video Platform</title>
+<title>RVID — AI Video Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Syne:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#030307;--s1:#07070f;--s2:#0d0d1a;--s3:#121222;
-  --b1:#1a1a2e;--b2:#242440;
-  --y:#e8ff47;--yd:#b8cf20;
-  --r:#ff3d5a;--b:#38cfff;--g:#00ffaa;--p:#c97fff;--o:#ff8c42;
-  --w:#f0f0ff;--m:#4a4a70;--m2:#6a6a90;
-  --font-head:'Orbitron',monospace;
-  --font-body:'DM Sans',sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
+  --bg:#020208;
+  --s1:#06060f;
+  --s2:#0b0b18;
+  --s3:#111120;
+  --b1:#181830;
+  --b2:#20203a;
+  --y:#e2ff3d;
+  --r:#ff3366;
+  --b:#2ee8ff;
+  --g:#00ffaa;
+  --p:#bf7fff;
+  --o:#ff7a3d;
+  --pk:#ff5fa0;
+  --tl:#3dffd4;
+  --w:#eeeeff;
+  --m:#3a3a60;
+  --m2:#6060a0;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--w);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;cursor:default}
 
-/* animated bg */
+body{
+  background:var(--bg);
+  color:var(--w);
+  font-family:'Syne',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── animated mesh bg ── */
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:
-    radial-gradient(ellipse 60% 40% at 20% 20%,rgba(232,255,71,.04) 0%,transparent 60%),
-    radial-gradient(ellipse 50% 50% at 80% 80%,rgba(56,207,255,.04) 0%,transparent 60%),
-    radial-gradient(ellipse 40% 60% at 50% 50%,rgba(201,127,255,.03) 0%,transparent 70%);
+    radial-gradient(ellipse 70% 50% at 15% 25%, rgba(226,255,61,.05) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 60% at 85% 75%, rgba(46,232,255,.04) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 70% at 50% 50%, rgba(191,127,255,.03) 0%,transparent 60%);
+  animation:meshpulse 8s ease-in-out infinite alternate;
 }
+@keyframes meshpulse{
+  0%{opacity:.7} 100%{opacity:1}
+}
+
+/* grid lines */
 body::after{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(232,255,71,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(232,255,71,.012) 1px,transparent 1px);
-  background-size:48px 48px;
+  background-image:
+    linear-gradient(rgba(226,255,61,.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(226,255,61,.014) 1px,transparent 1px);
+  background-size:52px 52px;
 }
 
-.wrap{max-width:1200px;margin:0 auto;padding:0 20px;position:relative;z-index:2}
+.z{position:relative;z-index:2}
+.wrap{max-width:1160px;margin:0 auto;padding:0 22px}
 
-/* ── HERO ── */
-.hero{text-align:center;padding:64px 20px 48px;position:relative;z-index:2}
+/* ── HEADER ── */
+.hdr{text-align:center;padding:72px 22px 0;position:relative;z-index:2}
 
-.hero-eyebrow{
+.hdr-pill{
   display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;
-  color:var(--y);border:1px solid rgba(232,255,71,.2);
-  background:rgba(232,255,71,.05);padding:5px 14px;border-radius:2px;
-  margin-bottom:28px;
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--y);border:1px solid rgba(226,255,61,.2);background:rgba(226,255,61,.05);
+  padding:5px 14px;border-radius:20px;margin-bottom:28px;
 }
-.hero-eyebrow .blink{width:6px;height:6px;border-radius:50%;background:var(--y);animation:blink 1.4s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hdr-pill .live{width:6px;height:6px;border-radius:50%;background:var(--y);animation:liveblink 1.2s infinite}
+@keyframes liveblink{0%,100%{opacity:1;box-shadow:0 0 6px var(--y)}50%{opacity:.3;box-shadow:none}}
 
-.hero-title{
-  font-family:var(--font-head);font-size:clamp(72px,14vw,148px);
-  font-weight:900;letter-spacing:.04em;line-height:.9;
-  color:var(--w);margin-bottom:6px;
-  text-shadow:0 0 120px rgba(232,255,71,.15);
-}
-.hero-title .slash{color:var(--y);text-shadow:0 0 60px rgba(232,255,71,.6)}
-
-.hero-sub{
-  font-family:var(--font-mono);font-size:11px;letter-spacing:.25em;text-transform:uppercase;
-  color:var(--m2);margin-top:14px;margin-bottom:36px;
-}
-.hero-sub em{color:var(--y);font-style:normal}
-
-/* engine count badge */
-.engine-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  font-family:var(--font-mono);font-size:11px;letter-spacing:.15em;
-  background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.2);
-  color:var(--y);padding:6px 14px;border-radius:20px;margin-bottom:40px;
+.logo{
+  font-family:'Orbitron',monospace;font-weight:900;
+  font-size:clamp(80px,15vw,160px);
+  letter-spacing:.05em;line-height:.9;
+  background:linear-gradient(135deg,#fff 0%,rgba(226,255,61,.9) 50%,#fff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 60px rgba(226,255,61,.3));
+  margin-bottom:6px;
 }
 
-/* ── PLATFORM SELECTOR ── */
-.platform-grid{
-  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
-  margin-bottom:40px;
+.logo-sub{
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--m2);margin-top:12px;margin-bottom:14px;
+}
+.logo-sub em{color:var(--y);font-style:normal}
+
+/* how it works strip */
+.how-strip{
+  display:flex;align-items:center;justify-content:center;gap:0;
+  flex-wrap:wrap;margin:20px 0 48px;
+}
+.how-step{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--m2);padding:0 14px;
+}
+.how-step .num{
+  width:22px;height:22px;border-radius:50%;
+  border:1px solid var(--y);color:var(--y);
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.how-arrow{color:var(--m);font-size:14px;margin:0 -4px}
+
+/* ── ENGINE GRID ── */
+.section-label{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--m2);margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+.engine-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:10px;
+  margin-bottom:36px;
 }
 
-.pchip{
-  display:flex;align-items:center;gap:7px;
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  padding:7px 14px;border-radius:3px;border:1px solid var(--b1);
-  background:var(--s2);cursor:pointer;transition:all .2s;
-  position:relative;
+.ecard{
+  background:var(--s2);border:1px solid var(--b1);border-radius:6px;
+  padding:18px 18px 16px;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:10px;
 }
-.pchip .d{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:box-shadow .2s}
-.pchip:hover,.pchip.on{transform:translateY(-2px)}
-.pchip .free-tag{
-  font-size:8px;letter-spacing:.1em;padding:1px 5px;border-radius:2px;
-  background:rgba(0,255,170,.1);color:var(--g);border:1px solid rgba(0,255,170,.15);
+.ecard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--ec,var(--y));opacity:.6;transition:opacity .2s;
 }
-
-/* per-platform colors */
-.pchip[data-id=kling]   {--pc:var(--y)}
-.pchip[data-id=runway]  {--pc:var(--b)}
-.pchip[data-id=pika]    {--pc:var(--r)}
-.pchip[data-id=luma]    {--pc:var(--p)}
-.pchip[data-id=hailuo]  {--pc:var(--g)}
-.pchip[data-id=hunyuan] {--pc:var(--o)}
-.pchip[data-id=wan]     {--pc:#ff6b9d}
-.pchip[data-id=vidu]    {--pc:#4af0ff}
-.pchip[data-id=pixverse]{--pc:#ffcc44}
-.pchip[data-id=ltx]     {--pc:#a8ff78}
-
-.pchip .d{background:var(--pc)}
-.pchip.on,.pchip:hover{
-  border-color:var(--pc);color:var(--pc);
-  background:color-mix(in srgb,var(--pc) 8%,var(--s2));
+.ecard:hover,.ecard.on{
+  border-color:var(--ec,var(--y));
+  background:color-mix(in srgb,var(--ec,var(--y)) 6%,var(--s2));
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px color-mix(in srgb,var(--ec,var(--y)) 15%,transparent);
 }
-.pchip.on .d,.pchip:hover .d{box-shadow:0 0 8px var(--pc)}
+.ecard:hover::before,.ecard.on::before{opacity:1}
 
-/* ── MAIN LAYOUT ── */
-.main{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:760px){.main{grid-template-columns:1fr}}
+.ecard-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.ecard-name{font-weight:700;font-size:14px;letter-spacing:.02em}
+.ecard-model{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--m2);margin-top:2px}
 
-/* ── PANEL ── */
-.panel{
-  background:var(--s2);border:1px solid var(--b1);border-radius:4px;
-  padding:24px;position:relative;overflow:hidden;
+.ecard-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{
+  font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;
+  padding:2px 7px;border-radius:2px;
 }
-.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--active-color,var(--y))}
+.tag-free{background:rgba(0,255,170,.1);color:var(--g);border:1px solid rgba(0,255,170,.18)}
+.tag-speed{background:rgba(226,255,61,.08);color:var(--y);border:1px solid rgba(226,255,61,.15)}
+.tag-q{background:rgba(46,232,255,.08);color:var(--b);border:1px solid rgba(46,232,255,.15)}
 
-.plabel{
-  font-family:var(--font-mono);font-size:9px;letter-spacing:.28em;text-transform:uppercase;
-  color:var(--m);margin-bottom:14px;
+.ecard-free-detail{
+  font-size:11px;color:var(--m2);line-height:1.5;
+  border-top:1px solid var(--b1);padding-top:10px;
+}
+.ecard-free-detail strong{color:var(--w);font-weight:500}
+
+.ecard-check{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  border:1px solid var(--m);display:flex;align-items:center;justify-content:center;
+  font-size:9px;transition:all .2s;
+}
+.ecard.on .ecard-check{
+  background:var(--ec,var(--y));border-color:var(--ec,var(--y));
+  color:var(--bg);
 }
 
-/* active engine bar */
-.engine-bar{
+/* ── PROMPT BOX ── */
+.prompt-section{margin-bottom:16px}
+
+.prompt-wrap{
+  background:var(--s2);border:1px solid var(--b2);border-radius:6px;
+  padding:20px;position:relative;
+}
+.prompt-wrap:focus-within{border-color:var(--y);box-shadow:0 0 0 1px rgba(226,255,61,.18)}
+
+textarea{
+  width:100%;background:transparent;border:none;outline:none;resize:none;
+  color:var(--w);font-family:'Syne',sans-serif;font-size:15px;
+  line-height:1.7;min-height:100px;
+}
+textarea::placeholder{color:var(--m2)}
+
+.prompt-toolbar{
   display:flex;align-items:center;justify-content:space-between;
-  background:var(--s1);border:1px solid var(--b2);border-radius:3px;
-  padding:11px 14px;margin-bottom:18px;
+  flex-wrap:wrap;gap:10px;
+  border-top:1px solid var(--b1);padding-top:14px;margin-top:10px;
 }
-.engine-name{font-family:var(--font-head);font-size:17px;letter-spacing:.08em}
-.engine-meta{display:flex;gap:8px;align-items:center}
-.etag{
-  font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;
-  padding:3px 8px;border-radius:2px;
+
+.style-chips{display:flex;flex-wrap:wrap;gap:7px}
+.schip{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;
+  padding:5px 12px;border-radius:20px;cursor:pointer;
+  border:1px solid var(--b2);color:var(--m2);background:transparent;
+  transition:all .15s;
 }
-.etag-free{background:rgba(0,255,170,.1);color:var(--g);border:1px solid rgba(0,255,170,.15)}
-.etag-speed{background:rgba(232,255,71,.08);color:var(--y);border:1px solid rgba(232,255,71,.15)}
+.schip:hover,.schip.on{border-color:var(--y);color:var(--y);background:rgba(226,255,61,.06)}
 
-/* ── TEXTAREA ── */
-textarea,input[type=text],input[type=password],input[type=number]{
-  width:100%;background:var(--s1);border:1px solid var(--b2);border-radius:3px;
-  color:var(--w);font-family:var(--font-body);font-size:14px;
-  padding:12px 14px;outline:none;resize:none;
-  transition:border-color .15s,box-shadow .15s;
+.char-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--m);white-space:nowrap}
+
+/* ── QUICK IDEAS ── */
+.ideas-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.idea{
+  font-size:12px;padding:7px 13px;border-radius:3px;
+  background:var(--s2);border:1px solid var(--b1);
+  color:var(--m2);cursor:pointer;transition:all .15s;
 }
-textarea{min-height:110px;line-height:1.65}
-textarea:focus,input:focus{border-color:var(--y);box-shadow:0 0 0 1px rgba(232,255,71,.2)}
+.idea:hover{border-color:rgba(226,255,61,.3);color:var(--w);background:rgba(226,255,61,.04)}
 
-/* ── TOGGLE ── */
-.toggle-row{display:flex;align-items:center;gap:9px;margin:10px 0;cursor:pointer;user-select:none}
-.tog{width:34px;height:18px;border-radius:9px;background:var(--b1);position:relative;transition:background .2s;flex-shrink:0}
-.tog.on{background:var(--y)}
-.tog::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
-.tog.on::after{left:19px}
-.toggle-row span{font-size:12px;color:var(--m2)}
+/* ── LAUNCH BTN ── */
+.launch-area{display:flex;gap:10px;margin-bottom:40px;flex-wrap:wrap}
 
-/* ── SETTINGS GRID ── */
-.srow{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
-.sg{flex:1;min-width:110px}
-.slbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--m);display:block;margin-bottom:6px}
-select{
-  width:100%;background:var(--s1);border:1px solid var(--b2);border-radius:3px;
-  color:var(--w);font-family:var(--font-body);font-size:13px;
-  padding:10px 12px;outline:none;cursor:pointer;transition:border-color .15s;
-}
-select:focus{border-color:var(--y)}
-
-/* ── API KEY AREA ── */
-.api-zone{margin-top:14px}
-.api-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.api-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.api-lbl{font-size:11px;color:var(--m2);min-width:72px;font-family:var(--font-mono)}
-.api-inp{flex:1}
-.api-get{
-  font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;
-  color:var(--y);text-decoration:none;white-space:nowrap;
-  opacity:.65;transition:opacity .15s;
-}
-.api-get:hover{opacity:1}
-.api-hint{font-size:11px;color:var(--m);line-height:1.6;margin-top:2px}
-
-/* ── GENERATE BTN ── */
-.gen-btn{
-  width:100%;padding:18px;margin-top:16px;
+.launch-btn{
+  flex:1;min-width:200px;padding:20px 32px;
   background:var(--y);color:var(--bg);
-  border:none;border-radius:3px;cursor:pointer;
-  font-family:var(--font-head);font-size:22px;font-weight:700;letter-spacing:.12em;
+  border:none;border-radius:5px;cursor:pointer;
+  font-family:'Orbitron',monospace;font-weight:700;
+  font-size:20px;letter-spacing:.1em;
   display:flex;align-items:center;justify-content:center;gap:10px;
   transition:all .2s;
 }
-.gen-btn:hover:not(:disabled){background:#f4ff70;transform:translateY(-2px);box-shadow:0 14px 48px rgba(232,255,71,.3)}
-.gen-btn:active:not(:disabled){transform:translateY(0)}
-.gen-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
-
-/* ── VIDEO OUTPUT ── */
-.video-frame{
-  background:#000;border:1px solid var(--b2);border-radius:3px;
-  aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
-  overflow:hidden;position:relative;margin-bottom:14px;
+.launch-btn:hover{
+  background:#f0ff60;transform:translateY(-2px);
+  box-shadow:0 16px 48px rgba(226,255,61,.35);
 }
-.video-frame video{width:100%;height:100%;object-fit:contain}
-.vph{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px;text-align:center}
-.vph-icon{font-size:44px;opacity:.12}
-.vph p{font-family:var(--font-mono);font-size:11px;letter-spacing:.15em;color:var(--m);text-transform:uppercase}
+.launch-btn:active{transform:translateY(0)}
+.launch-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
 
-/* ── PROGRESS ── */
-.prog-wrap{display:none;margin-bottom:14px}
-.prog-head{display:flex;justify-content:space-between;margin-bottom:7px}
-.prog-head span{font-family:var(--font-mono);font-size:11px;color:var(--m2)}
-.prog-head .pct{color:var(--y)}
-.prog-bar{height:2px;background:var(--b1);border-radius:1px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--y),var(--b));width:0%;transition:width .4s;box-shadow:0 0 8px rgba(232,255,71,.5);border-radius:1px}
-
-/* ── LOG ── */
-.log{
-  background:var(--s1);border:1px solid var(--b1);border-radius:3px;
-  padding:13px 15px;min-height:90px;max-height:150px;overflow-y:auto;
-  font-family:var(--font-mono);font-size:11px;line-height:1.9;
+.copy-btn{
+  padding:20px 24px;background:transparent;
+  border:1px solid var(--b2);border-radius:5px;
+  color:var(--m2);font-family:'Syne',sans-serif;font-size:13px;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
 }
-.ll{animation:fi .25s ease}
-.ll.ok{color:var(--g)}
-.ll.er{color:var(--r)}
-.ll.wn{color:var(--o)}
-.ll.in{color:var(--m2)}
-@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.copy-btn:hover{border-color:var(--y);color:var(--y)}
 
-/* ── ACTION ROW ── */
-.act-row{display:flex;gap:8px;margin-top:12px}
-.act-btn{
-  flex:1;padding:10px;background:transparent;border:1px solid var(--b2);
-  border-radius:3px;color:var(--m2);font-family:var(--font-mono);
-  font-size:10px;letter-spacing:.15em;text-transform:uppercase;
-  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;
+/* ── ACTIVE ENGINE PREVIEW ── */
+.active-bar{
+  background:var(--s2);border:1px solid var(--b2);border-radius:5px;
+  padding:16px 20px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
 }
-.act-btn:hover{border-color:var(--y);color:var(--y)}
-.act-btn:disabled{opacity:.3;cursor:not-allowed}
-
-/* ── COMPARE TABLE ── */
-.compare{margin-bottom:16px}
-.ctbl{width:100%;border-collapse:collapse;font-size:12px}
-.ctbl th{
-  font-family:var(--font-mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;
-  color:var(--m);padding:8px 12px;border-bottom:1px solid var(--b1);text-align:left;font-weight:400;
+.active-left{display:flex;align-items:center;gap:12px}
+.active-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.active-name{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;letter-spacing:.06em}
+.active-free{font-size:12px;color:var(--m2)}
+.active-right{
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;
+  color:var(--g);display:flex;align-items:center;gap:6px;
 }
-.ctbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.03)}
-.ctbl tr{cursor:pointer;transition:background .15s}
-.ctbl tr:hover td{background:rgba(255,255,255,.02)}
-.ctbl tr.sel td{background:rgba(232,255,71,.04)}
-.ctbl tr:last-child td{border-bottom:none}
+.active-right::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--g);animation:liveblink 1.4s infinite}
 
-.pname{display:flex;align-items:center;gap:8px;font-weight:500}
-.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.stars{letter-spacing:-2px;font-size:11px}
-.spd{font-family:var(--font-mono);font-size:10px;padding:2px 7px;border-radius:2px}
-.spd-f{background:rgba(0,255,170,.1);color:var(--g)}
-.spd-m{background:rgba(232,255,71,.1);color:var(--y)}
-.spd-s{background:rgba(255,61,90,.1);color:var(--r)}
-.fb{font-family:var(--font-mono);font-size:9px;padding:2px 7px;border-radius:2px;
-    background:rgba(0,255,170,.08);color:var(--g);border:1px solid rgba(0,255,170,.15)}
-.note{font-size:10px;color:var(--m2)}
-
-/* ── QUICK PROMPTS ── */
-.qp-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:0}
-.qp{
-  font-family:var(--font-body);font-size:12px;
-  padding:7px 13px;background:var(--s2);border:1px solid var(--b1);
-  border-radius:3px;color:var(--m2);cursor:pointer;transition:all .15s;
+/* ── HOW TO USE GUIDE ── */
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:40px}
+.guide-card{
+  background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:20px;
 }
-.qp:hover{border-color:var(--y);color:var(--y);background:rgba(232,255,71,.04)}
-
-/* ── SPINNER ── */
-.spin{
-  width:16px;height:16px;border-radius:50%;
-  border:2px solid rgba(0,0,0,.2);border-top-color:var(--bg);
-  animation:spin .6s linear infinite;display:none;flex-shrink:0;
+.guide-num{
+  font-family:'Orbitron',monospace;font-size:28px;font-weight:900;
+  color:var(--b1);line-height:1;margin-bottom:10px;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
+.guide-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.guide-body{font-size:12px;color:var(--m2);line-height:1.7}
+.guide-body a{color:var(--y);text-decoration:none}
+.guide-body a:hover{text-decoration:underline}
+
+/* ── TIPS ── */
+.tips-row{
+  background:var(--s2);border:1px solid var(--b1);border-radius:5px;
+  padding:20px;margin-bottom:40px;
+}
+.tip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tip{
+  font-size:11px;padding:6px 12px;border-radius:3px;
+  background:rgba(46,232,255,.06);border:1px solid rgba(46,232,255,.15);color:var(--b);
+  font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all .15s;
+}
+.tip:hover{background:rgba(46,232,255,.12);color:var(--w)}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:40px 22px 32px;position:relative;z-index:2;border-top:1px solid var(--b1)}
+.ft-logo{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;letter-spacing:.1em;
+  background:linear-gradient(90deg,var(--y),var(--b));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text}
+.ft-note{font-size:11px;color:var(--m);margin-top:8px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em}
 
 /* ── TOAST ── */
 .toast{
-  position:fixed;bottom:20px;right:20px;z-index:999;
-  background:var(--s2);border:1px solid var(--b2);border-radius:3px;
-  padding:12px 18px;font-family:var(--font-mono);font-size:12px;color:var(--w);
-  transform:translateY(60px);opacity:0;transition:all .28s;pointer-events:none;
+  position:fixed;bottom:22px;right:22px;z-index:999;
+  background:var(--s3);border:1px solid var(--b2);border-radius:4px;
+  padding:12px 18px;font-size:12px;font-family:'JetBrains Mono',monospace;
+  transform:translateY(60px);opacity:0;transition:all .25s;pointer-events:none;
 }
 .toast.show{transform:translateY(0);opacity:1}
-.toast.ok{border-left:3px solid var(--g)}
-.toast.er{border-left:3px solid var(--r)}
+.toast.ok{border-left:2px solid var(--g);color:var(--g)}
+.toast.er{border-left:2px solid var(--r);color:var(--r)}
+.toast.inf{border-left:2px solid var(--y);color:var(--y)}
 
-/* ── FOOTER ── */
-footer{text-align:center;padding:48px 20px 36px;position:relative;z-index:2}
-.ft-logo{font-family:var(--font-head);font-size:28px;letter-spacing:.1em;color:var(--m)}
-.ft-logo span{color:var(--y)}
-.ft-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:14px}
-.ft-links a{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--m);text-decoration:none;transition:color .15s}
-.ft-links a:hover{color:var(--y)}
+@media(max-width:600px){
+  .how-arrow{display:none}
+  .how-step{padding:4px 8px}
+  .launch-btn{font-size:16px;padding:16px 20px}
+}
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-eyebrow"><span class="blink"></span> RVID ULTIMATE PLATFORM</div>
-  <div class="hero-title">RV<span class="slash">I</span>D</div>
-  <div class="hero-sub">10 AI Engines &nbsp;·&nbsp; <em>Always Free Tiers</em> &nbsp;·&nbsp; One Platform</div>
-  <div class="engine-badge">⬡ 10 ENGINES LOADED — INCLUDING HUNYUANVIDEO, WAN 2.2 & MORE</div>
+<!-- HEADER -->
+<div class="hdr z">
+  <div class="hdr-pill"><span class="live"></span> 10 ENGINES · ZERO API KEYS · FREE FOREVER</div>
+  <div class="logo">RVID</div>
+  <div class="logo-sub">AI Video Studio &nbsp;·&nbsp; <em>No signup. No API key. No payment. Ever.</em></div>
 
-  <!-- Platform chips -->
-  <div class="platform-grid">
-    <div class="pchip on" data-id="kling"    onclick="sel('kling')">   <span class="d"></span>Kling 3.0<span class="free-tag">10/day</span></div>
-    <div class="pchip"    data-id="runway"   onclick="sel('runway')">  <span class="d"></span>Runway Gen-4<span class="free-tag">125/mo</span></div>
-    <div class="pchip"    data-id="pika"     onclick="sel('pika')">    <span class="d"></span>Pika 2.5<span class="free-tag">daily</span></div>
-    <div class="pchip"    data-id="luma"     onclick="sel('luma')">    <span class="d"></span>Luma Ray 3<span class="free-tag">30/mo</span></div>
-    <div class="pchip"    data-id="hailuo"   onclick="sel('hailuo')">  <span class="d"></span>Hailuo 2.3<span class="free-tag">daily</span></div>
-    <div class="pchip"    data-id="hunyuan"  onclick="sel('hunyuan')"> <span class="d"></span>HunyuanVideo<span class="free-tag">open src</span></div>
-    <div class="pchip"    data-id="wan"      onclick="sel('wan')">     <span class="d"></span>Wan 2.2<span class="free-tag">open src</span></div>
-    <div class="pchip"    data-id="vidu"     onclick="sel('vidu')">    <span class="d"></span>Vidu Q3<span class="free-tag">credits</span></div>
-    <div class="pchip"    data-id="pixverse" onclick="sel('pixverse')"><span class="d"></span>PixVerse v5<span class="free-tag">daily</span></div>
-    <div class="pchip"    data-id="ltx"      onclick="sel('ltx')">     <span class="d"></span>LTX-Video 2<span class="free-tag">open src</span></div>
+  <div class="how-strip">
+    <div class="how-step"><span class="num">1</span> Type your prompt</div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><span class="num">2</span> Pick an engine</div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><span class="num">3</span> Click Generate</div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><span class="num">4</span> Get your video</div>
   </div>
 </div>
 
-<div class="wrap">
+<div class="wrap z">
 
-  <!-- COMPARE TABLE -->
-  <div class="panel compare">
-    <div class="plabel">All 10 Engines — Research-Backed 2026 Rankings — Click to Switch</div>
-    <table class="ctbl">
-      <thead><tr>
-        <th>Engine</th><th>Free Allowance</th><th>Quality</th><th>Speed</th><th>Best For</th><th>By</th>
-      </tr></thead>
-      <tbody>
-        <tr class="sel" id="tr-kling"    onclick="sel('kling')">   <td><div class="pname"><span class="pdot" style="background:var(--y)"></span>Kling 3.0</div></td>    <td><span class="fb">66 credits/day</span></td>   <td><span class="stars" style="color:var(--y)">★★★★★</span></td><td><span class="spd spd-m">60–90s</span></td>  <td class="note">Cinematic realism</td><td class="note">Kuaishou</td></tr>
-        <tr id="tr-runway"   onclick="sel('runway')">  <td><div class="pname"><span class="pdot" style="background:var(--b)"></span>Runway Gen-4</div></td>  <td><span class="fb">125 credits/mo</span></td>   <td><span class="stars" style="color:var(--b)">★★★★★</span></td><td><span class="spd spd-f">30–60s</span></td>  <td class="note">Hollywood quality</td><td class="note">Runway</td></tr>
-        <tr id="tr-pika"     onclick="sel('pika')">    <td><div class="pname"><span class="pdot" style="background:var(--r)"></span>Pika 2.5</div></td>      <td><span class="fb">Daily credits</span></td>    <td><span class="stars" style="color:var(--r)">★★★★</span></td> <td><span class="spd spd-f">30–45s</span></td>  <td class="note">Stylized &amp; effects</td><td class="note">Pika Labs</td></tr>
-        <tr id="tr-luma"     onclick="sel('luma')">    <td><div class="pname"><span class="pdot" style="background:var(--p)"></span>Luma Ray 3</div></td>    <td><span class="fb">30 videos/mo</span></td>     <td><span class="stars" style="color:var(--p)">★★★★★</span></td><td><span class="spd spd-m">60–120s</span></td> <td class="note">Photorealistic</td><td class="note">Luma AI</td></tr>
-        <tr id="tr-hailuo"   onclick="sel('hailuo')">  <td><div class="pname"><span class="pdot" style="background:var(--g)"></span>Hailuo 2.3</div></td>   <td><span class="fb">Daily credits</span></td>    <td><span class="stars" style="color:var(--g)">★★★★</span></td> <td><span class="spd spd-f">30–60s</span></td>  <td class="note">Smooth motion</td><td class="note">MiniMax</td></tr>
-        <tr id="tr-hunyuan"  onclick="sel('hunyuan')"> <td><div class="pname"><span class="pdot" style="background:var(--o)"></span>HunyuanVideo 1.5</div></td><td><span class="fb">100% Free</span></td>     <td><span class="stars" style="color:var(--o)">★★★★★</span></td><td><span class="spd spd-s">5–15min</span></td> <td class="note">Open-source SOTA</td><td class="note">Tencent</td></tr>
-        <tr id="tr-wan"      onclick="sel('wan')">     <td><div class="pname"><span class="pdot" style="background:#ff6b9d"></span>Wan 2.2</div></td>         <td><span class="fb">100% Free</span></td>     <td><span class="stars" style="color:#ff6b9d">★★★★★</span></td><td><span class="spd spd-s">4–12min</span></td> <td class="note">Best open-source</td><td class="note">Alibaba</td></tr>
-        <tr id="tr-vidu"     onclick="sel('vidu')">    <td><div class="pname"><span class="pdot" style="background:#4af0ff"></span>Vidu Q3</div></td>        <td><span class="fb">Free credits</span></td>    <td><span class="stars" style="color:#4af0ff">★★★★</span></td> <td><span class="spd spd-f">~10s</span></td>    <td class="note">Fastest generation</td><td class="note">Shengshu</td></tr>
-        <tr id="tr-pixverse" onclick="sel('pixverse')"><td><div class="pname"><span class="pdot" style="background:#ffcc44"></span>PixVerse v5</div></td>    <td><span class="fb">Daily free</span></td>      <td><span class="stars" style="color:#ffcc44">★★★★</span></td> <td><span class="spd spd-f">30–60s</span></td>  <td class="note">Multi-style &amp; FX</td><td class="note">PixVerse</td></tr>
-        <tr id="tr-ltx"      onclick="sel('ltx')">     <td><div class="pname"><span class="pdot" style="background:#a8ff78"></span>LTX-Video 2</div></td>    <td><span class="fb">100% Free</span></td>     <td><span class="stars" style="color:#a8ff78">★★★★</span></td> <td><span class="spd spd-f">Real-time</span></td><td class="note">4K · 50fps</td><td class="note">Lightricks</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- MAIN GRID -->
-  <div class="main">
-
-    <!-- LEFT: Controls -->
-    <div>
-      <div class="panel" id="left-panel">
-        <div class="plabel">01 — Active Engine</div>
-        <div class="engine-bar">
-          <div>
-            <div class="engine-name" id="en-name">KLING 3.0</div>
-          </div>
-          <div class="engine-meta">
-            <span class="etag etag-free" id="en-free">66 FREE/DAY</span>
-            <span class="etag etag-speed" id="en-spd">⚡ 60–90s</span>
-          </div>
+  <!-- PROMPT -->
+  <div class="prompt-section">
+    <div class="section-label">Your Prompt</div>
+    <div class="prompt-wrap">
+      <textarea id="prompt" placeholder='Describe your video scene…&#10;e.g. "A lone astronaut walks across glowing Martian dunes at sunset, slow motion, cinematic, 4K"' oninput="updateCount()"></textarea>
+      <div class="prompt-toolbar">
+        <div class="style-chips" id="style-chips">
+          <button class="schip on" onclick="addStyle(this,'cinematic, dramatic lighting, film grain')">Cinematic</button>
+          <button class="schip" onclick="addStyle(this,'ultra photorealistic, 8K, natural lighting')">Realistic</button>
+          <button class="schip" onclick="addStyle(this,'anime style, vibrant colors, fluid animation')">Anime</button>
+          <button class="schip" onclick="addStyle(this,'3D rendered, volumetric lighting, octane render')">3D</button>
+          <button class="schip" onclick="addStyle(this,'slow motion, high frame rate, detailed')">Slow-Mo</button>
+          <button class="schip" onclick="addStyle(this,'aerial shot, drone footage, wide angle')">Aerial</button>
         </div>
-
-        <div class="plabel">02 — Prompt</div>
-        <textarea id="prompt" placeholder='Describe your scene…&#10;"A ballerina spins in an abandoned grand theatre, golden dust particles drift through shafts of light, slow motion, cinematic 4K"'></textarea>
-
-        <div class="toggle-row" onclick="togEnhance()">
-          <div class="tog on" id="etog"></div>
-          <span>Auto-Enhance Prompt with AI</span>
-        </div>
-
-        <div class="plabel" style="margin-top:14px">03 — Settings</div>
-        <div class="srow">
-          <div class="sg">
-            <span class="slbl">Style</span>
-            <select id="style">
-              <option value="cinematic">Cinematic</option>
-              <option value="realistic">Ultra Realistic</option>
-              <option value="anime">Anime</option>
-              <option value="3d">3D Render</option>
-              <option value="documentary">Documentary</option>
-              <option value="noir">Film Noir</option>
-            </select>
-          </div>
-          <div class="sg">
-            <span class="slbl">Duration</span>
-            <select id="dur">
-              <option value="5">5 seconds</option>
-              <option value="10" selected>10 seconds</option>
-              <option value="15">15 seconds</option>
-              <option value="30">30 seconds</option>
-            </select>
-          </div>
-          <div class="sg">
-            <span class="slbl">Ratio</span>
-            <select id="ratio">
-              <option value="16:9" selected>16:9 Widescreen</option>
-              <option value="9:16">9:16 Reels/TikTok</option>
-              <option value="1:1">1:1 Square</option>
-              <option value="4:3">4:3 Classic</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="plabel" style="margin-top:4px">04 — API Key</div>
-        <div class="api-zone">
-          <div class="api-row">
-            <span class="api-dot" id="api-dot" style="background:var(--y)"></span>
-            <span class="api-lbl" id="api-lbl">Kling Key</span>
-            <input type="password" class="api-inp" id="api-key" placeholder="Paste your free API key here"/>
-            <a class="api-get" id="api-get" href="https://klingai.com" target="_blank">GET FREE →</a>
-          </div>
-          <div class="api-hint" id="api-hint">Sign up at klingai.com → API → Copy your key. 66 free credits refreshed daily.</div>
-        </div>
-
-        <button class="gen-btn" id="gbtn" onclick="generate()">
-          <span id="gbtn-txt">GENERATE VIDEO</span>
-          <div class="spin" id="spin"></div>
-        </button>
+        <span class="char-count" id="ccount">0 / 500</span>
       </div>
     </div>
+  </div>
 
-    <!-- RIGHT: Output -->
-    <div>
-      <div class="panel">
-        <div class="plabel">Video Output</div>
-        <div class="video-frame">
-          <div class="vph" id="vph">
-            <div class="vph-icon">▶</div>
-            <p>Your video appears here</p>
-          </div>
-          <video id="vplayer" controls style="display:none" autoplay></video>
-        </div>
+  <!-- QUICK IDEAS -->
+  <div class="section-label">Quick Ideas</div>
+  <div class="ideas-row">
+    <div class="idea" onclick="useIdea(this)">🌊 Ocean waves at golden hour</div>
+    <div class="idea" onclick="useIdea(this)">🏙️ Cyberpunk city rain neon</div>
+    <div class="idea" onclick="useIdea(this)">🌌 Galaxy nebula timelapse</div>
+    <div class="idea" onclick="useIdea(this)">🦅 Eagle soaring over mountains</div>
+    <div class="idea" onclick="useIdea(this)">💃 Dancer in spotlight and fog</div>
+    <div class="idea" onclick="useIdea(this)">🔥 Fire explosion macro slow mo</div>
+    <div class="idea" onclick="useIdea(this)">🌿 Forest sunrays morning mist</div>
+    <div class="idea" onclick="useIdea(this)">🚀 Rocket launching into space</div>
+    <div class="idea" onclick="useIdea(this)">🐉 Dragon flying over volcano</div>
+    <div class="idea" onclick="useIdea(this)">🌸 Cherry blossoms falling wind</div>
+  </div>
 
-        <div class="prog-wrap" id="prog">
-          <div class="prog-head">
-            <span id="prog-lbl">Generating…</span>
-            <span class="pct" id="prog-pct">0%</span>
-          </div>
-          <div class="prog-bar"><div class="prog-fill" id="pfill"></div></div>
-        </div>
-
-        <div class="plabel">Generation Log</div>
-        <div class="log" id="log">
-          <div class="ll in">// RVID Ultimate — 10 engines loaded</div>
-          <div class="ll in">// Select engine → Enter prompt → Generate</div>
-        </div>
-
-        <div class="act-row">
-          <button class="act-btn" id="dl-btn" onclick="dlVideo()" disabled>⬇ Download</button>
-          <button class="act-btn" onclick="copyPrompt()">⎘ Copy Prompt</button>
-          <button class="act-btn" onclick="clearAll()">✕ Clear</button>
-        </div>
+  <!-- ACTIVE ENGINE BAR -->
+  <div class="active-bar" id="active-bar">
+    <div class="active-left">
+      <div class="active-dot" id="active-dot" style="background:var(--y);box-shadow:0 0 8px var(--y)"></div>
+      <div>
+        <div class="active-name" id="active-name">KLING AI</div>
+        <div class="active-free" id="active-free">66 free credits/day · No credit card required</div>
       </div>
+    </div>
+    <div class="active-right" id="active-status">READY TO GENERATE</div>
+  </div>
 
-      <!-- Quick prompts -->
-      <div class="panel" style="margin-top:0">
-        <div class="plabel">Quick Ideas — Click to Use</div>
-        <div class="qp-wrap">
-          <div class="qp" onclick="useQ(this)">🌊 Ocean waves crashing golden hour</div>
-          <div class="qp" onclick="useQ(this)">🏙️ Cyberpunk city neon rain night</div>
-          <div class="qp" onclick="useQ(this)">🌌 Galaxy nebula forming timelapse</div>
-          <div class="qp" onclick="useQ(this)">🦅 Eagle soaring mountain peaks</div>
-          <div class="qp" onclick="useQ(this)">💃 Dancer in fog spotlight closeup</div>
-          <div class="qp" onclick="useQ(this)">🔥 Slow motion fire explosion macro</div>
-          <div class="qp" onclick="useQ(this)">🌿 Forest morning mist sunrays</div>
-          <div class="qp" onclick="useQ(this)">🚀 Spacecraft entering atmosphere</div>
-        </div>
-      </div>
+  <!-- LAUNCH -->
+  <div class="launch-area">
+    <button class="launch-btn" id="launch-btn" onclick="launch()">
+      ▶ &nbsp;GENERATE VIDEO
+    </button>
+    <button class="copy-btn" onclick="copyPrompt()">⎘ Copy Prompt</button>
+    <button class="copy-btn" onclick="clearPrompt()">✕ Clear</button>
+  </div>
+
+  <!-- ENGINE GRID -->
+  <div class="section-label">Choose Your Engine</div>
+  <div class="engine-grid" id="engine-grid"></div>
+
+  <!-- HOW TO USE -->
+  <div class="section-label">How It Works</div>
+  <div class="guide-grid">
+    <div class="guide-card">
+      <div class="guide-num">01</div>
+      <div class="guide-title">Type Your Prompt</div>
+      <div class="guide-body">Describe what you want to see. Be specific — mention lighting, mood, camera style, speed. Use the style chips above to auto-add cinematic keywords.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-num">02</div>
+      <div class="guide-title">Pick an Engine</div>
+      <div class="guide-body">Each engine is a real, working AI platform. All have free tiers — no credit card needed. Kling gives 66 free videos daily. Pika and Hailuo refresh every day too.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-num">03</div>
+      <div class="guide-title">Click Generate</div>
+      <div class="guide-body">RVID opens the platform with your prompt pre-filled. Just hit their Generate button. No API keys, no coding, no errors. It just works.</div>
+    </div>
+    <div class="guide-card">
+      <div class="guide-num">04</div>
+      <div class="guide-title">Download &amp; Use</div>
+      <div class="guide-body">Download your video from their site. Use it for Instagram Reels, YouTube Shorts, or your automation pipeline. Switch engines anytime one runs out of credits.</div>
+    </div>
+  </div>
+
+  <!-- PROMPT TIPS -->
+  <div class="tips-row">
+    <div class="section-label" style="margin-bottom:0">Power Words — Click to Add to Prompt</div>
+    <div class="tip-list">
+      <div class="tip" onclick="addTip(this)">cinematic</div>
+      <div class="tip" onclick="addTip(this)">slow motion</div>
+      <div class="tip" onclick="addTip(this)">ultra realistic</div>
+      <div class="tip" onclick="addTip(this)">4K</div>
+      <div class="tip" onclick="addTip(this)">golden hour</div>
+      <div class="tip" onclick="addTip(this)">dramatic lighting</div>
+      <div class="tip" onclick="addTip(this)">shallow depth of field</div>
+      <div class="tip" onclick="addTip(this)">aerial shot</div>
+      <div class="tip" onclick="addTip(this)">macro lens</div>
+      <div class="tip" onclick="addTip(this)">film grain</div>
+      <div class="tip" onclick="addTip(this)">smooth camera movement</div>
+      <div class="tip" onclick="addTip(this)">hyper detailed</div>
+      <div class="tip" onclick="addTip(this)">anamorphic lens flare</div>
+      <div class="tip" onclick="addTip(this)">volumetric fog</div>
+      <div class="tip" onclick="addTip(this)">neon lights</div>
+      <div class="tip" onclick="addTip(this)">timelapse</div>
     </div>
   </div>
 
 </div>
 
-<footer>
-  <div class="ft-logo">RV<span>I</span>D <span style="font-size:14px;letter-spacing:.2em;color:var(--m)">ULTIMATE</span></div>
-  <div class="ft-links">
-    <a href="https://klingai.com" target="_blank">Kling AI</a>
-    <a href="https://runwayml.com" target="_blank">Runway ML</a>
-    <a href="https://pika.art" target="_blank">Pika Art</a>
-    <a href="https://lumalabs.ai" target="_blank">Luma AI</a>
-    <a href="https://hailuoai.com" target="_blank">Hailuo AI</a>
-    <a href="https://github.com/Tencent-Hunyuan/HunyuanVideo" target="_blank">HunyuanVideo</a>
-    <a href="https://huggingface.co/Wan-AI" target="_blank">Wan 2.2</a>
-    <a href="https://vidu.io" target="_blank">Vidu</a>
-    <a href="https://pixverse.ai" target="_blank">PixVerse</a>
-    <a href="https://ltx.studio" target="_blank">LTX-Video</a>
-  </div>
+<footer class="z">
+  <div class="ft-logo">RVID</div>
+  <div class="ft-note">Zero API keys · Zero payments · 10 free AI engines · Deploy on Vercel free</div>
 </footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Platform definitions ──────────────────────────────────────────────────────
-const P = {
-  kling:{
-    name:'KLING 3.0',free:'66 FREE/DAY',spd:'⚡ 60–90s',
-    dot:'#e8ff47',apiLbl:'Kling Key',apiHint:'klingai.com → API section. 66 daily credits free forever.',
-    apiLink:'https://klingai.com',ph:'kling_xxxxxxxxxxxxxx',
-    color:'var(--y)',
-    ep:'https://api.klingai.com/v1/videos/text2video',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Bearer ${k}`}),
-    body:(p,o)=>({model:'kling-v2',prompt:ep(p,o),negative_prompt:'blurry,distorted,low quality',duration:+o.dur,aspect_ratio:o.ratio,cfg_scale:0.5}),
-    taskId:d=>d?.data?.task_id,
-    pollUrl:id=>`https://api.klingai.com/v1/videos/text2video/${id}`,
-    done:d=>d?.data?.task_status==='succeed',
-    vidUrl:d=>d?.data?.works?.[0]?.resource?.resource
+// ── Engine definitions ────────────────────────────────────────────────────────
+const ENGINES = [
+  {
+    id:'kling', name:'Kling AI', model:'Kling 3.0',
+    color:'#e2ff3d', free:'66 free credits/day',
+    freeDetail:'<strong>66 videos free</strong> every 24 hours. No credit card. Best quality.',
+    tags:['#1 Quality','⚡ 60–90s','66/day free'],
+    tagClasses:['tag-q','tag-speed','tag-free'],
+    url: p => `https://klingai.com/text-to-video?prompt=${enc(p)}`,
+    signup:'https://klingai.com',
+    quality:5, note:'Best physics, most realistic'
   },
-  runway:{
-    name:'RUNWAY GEN-4',free:'125 CREDITS/MO',spd:'⚡ 30–60s',
-    dot:'#38cfff',apiLbl:'Runway Key',apiHint:'runwayml.com → Settings → API Keys. 125 free credits every month.',
-    apiLink:'https://app.runwayml.com/settings',ph:'key_xxxxxxxxxxxxxx',
-    color:'var(--b)',
-    ep:'https://api.dev.runwayml.com/v1/image_to_video',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Bearer ${k}`,'X-Runway-Version':'2024-11-06'}),
-    body:(p,o)=>({promptText:ep(p,o),model:'gen4_turbo',ratio:o.ratio==='9:16'?'720:1280':o.ratio==='1:1'?'720:720':'1280:720',duration:Math.min(+o.dur,10)}),
-    taskId:d=>d?.id,
-    pollUrl:id=>`https://api.dev.runwayml.com/v1/tasks/${id}`,
-    done:d=>d?.status==='SUCCEEDED',
-    vidUrl:d=>d?.output?.[0]
+  {
+    id:'hailuo', name:'Hailuo AI', model:'Hailuo 2.3',
+    color:'#00ffaa', free:'Daily free credits',
+    freeDetail:'<strong>Daily free credits</strong> refresh every 24h. No card needed. Smooth motion.',
+    tags:['Smooth Motion','⚡ 30–60s','Daily free'],
+    tagClasses:['tag-q','tag-speed','tag-free'],
+    url: p => `https://hailuoai.video/?prompt=${enc(p)}`,
+    signup:'https://hailuoai.video',
+    quality:4, note:'Best for smooth human motion'
   },
-  pika:{
-    name:'PIKA 2.5',free:'DAILY CREDITS',spd:'⚡ 30–45s',
-    dot:'#ff3d5a',apiLbl:'Pika Key',apiHint:'pika.art → Profile → API Access. Free daily credits, no card.',
-    apiLink:'https://pika.art',ph:'pika_xxxxxxxxxxxxxx',
-    color:'var(--r)',
-    ep:'https://api.pika.art/v1/generate',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Bearer ${k}`}),
-    body:(p,o)=>({promptText:ep(p,o),options:{frameRate:24,duration:+o.dur,aspectRatio:o.ratio}}),
-    taskId:d=>d?.data?.id,
-    pollUrl:id=>`https://api.pika.art/v1/generate/${id}`,
-    done:d=>d?.data?.status==='finished',
-    vidUrl:d=>d?.data?.video?.url
+  {
+    id:'pika', name:'Pika Art', model:'Pika 2.5',
+    color:'#ff3366', free:'Daily free credits',
+    freeDetail:'<strong>Free daily credits</strong>, no credit card. Great for stylized and effect videos.',
+    tags:['Creative FX','⚡ 30–45s','Daily free'],
+    tagClasses:['tag-q','tag-speed','tag-free'],
+    url: p => `https://pika.art/create?text=${enc(p)}`,
+    signup:'https://pika.art',
+    quality:4, note:'Best for stylized creative videos'
   },
-  luma:{
-    name:'LUMA RAY 3',free:'30 VIDEOS/MO',spd:'⏱ 60–120s',
-    dot:'#c97fff',apiLbl:'Luma Key',apiHint:'lumalabs.ai → Dream Machine → API. 30 free videos/month, no card.',
-    apiLink:'https://lumalabs.ai/dream-machine/api',ph:'luma_xxxxxxxxxxxxxx',
-    color:'var(--p)',
-    ep:'https://api.lumalabs.ai/dream-machine/v1/generations',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Bearer ${k}`}),
-    body:(p,o)=>({prompt:ep(p,o),model:'ray-2',aspect_ratio:o.ratio,loop:false}),
-    taskId:d=>d?.id,
-    pollUrl:id=>`https://api.lumalabs.ai/dream-machine/v1/generations/${id}`,
-    done:d=>d?.state==='completed',
-    vidUrl:d=>d?.assets?.video
+  {
+    id:'luma', name:'Luma Dream', model:'Ray 3',
+    color:'#bf7fff', free:'30 videos/month free',
+    freeDetail:'<strong>30 free videos/month</strong>. No credit card. Hyper-photorealistic quality.',
+    tags:['Photorealistic','⏱ 60–120s','30/mo free'],
+    tagClasses:['tag-q','tag-speed','tag-free'],
+    url: p => `https://lumalabs.ai/dream-machine?prompt=${enc(p)}`,
+    signup:'https://lumalabs.ai/dream-machine',
+    quality:5, note:'Most photorealistic free option'
   },
-  hailuo:{
-    name:'HAILUO 2.3',free:'DAILY FREE',spd:'⚡ 30–60s',
-    dot:'#00ffaa',apiLbl:'Hailuo Key',apiHint:'hailuoai.com → Developer → API Keys. Free daily quota refreshed every 24h.',
-    apiLink:'https://hailuoai.com',ph:'hailuo_xxxxxxxxxxxxxx',
-    color:'var(--g)',
-    ep:'https://api.minimax.chat/v1/video_generation',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Bearer ${k}`}),
-    body:(p,o)=>({model:'video-01',prompt:ep(p,o),duration:+o.dur,aspect_ratio:o.ratio}),
-    taskId:d=>d?.task_id,
-    pollUrl:id=>`https://api.minimax.chat/v1/query/video_generation?task_id=${id}`,
-    done:d=>d?.status==='Success',
-    vidUrl:d=>d?.file_id?`https://api.minimax.chat/v1/files/retrieve?file_id=${d.file_id}`:null
+  {
+    id:'runway', name:'Runway ML', model:'Gen-4 Turbo',
+    color:'#2ee8ff', free:'125 credits/month free',
+    freeDetail:'<strong>125 free credits/month</strong>. No card required. Hollywood-level quality.',
+    tags:['Hollywood','⚡ 30–60s','125/mo free'],
+    tagClasses:['tag-q','tag-speed','tag-free'],
+    url: p => `https://app.runwayml.com/video-tools/teams/personal/ai-tools/gen-video?prompt=${enc(p)}`,
+    signup:'https://runwayml.com',
+    quality:5, note:'Industry standard quality'
   },
-  hunyuan:{
-    name:'HUNYUANVIDEO 1.5',free:'100% FREE',spd:'⏳ 5–15 min',
-    dot:'#ff8c42',apiLbl:'Novita Key',apiHint:'novita.ai → Sign up free → API Keys. HunyuanVideo runs FREE via their free tier. No own GPU needed!',
-    apiLink:'https://novita.ai',ph:'novita_xxxxxxxxxxxxxx',
-    color:'var(--o)',
-    ep:'https://api.novita.ai/v3/async/hunyuan-video-fast',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Bearer ${k}`}),
-    body:(p,o)=>({model_name:'hunyuan-video-fast',prompt:ep(p,o),width:o.ratio==='9:16'?720:1280,height:o.ratio==='9:16'?1280:720,steps:25,seed:-1}),
-    taskId:d=>d?.task_id,
-    pollUrl:id=>`https://api.novita.ai/v3/async/task-result?task_id=${id}`,
-    done:d=>d?.task?.status==='TASK_STATUS_SUCCEED',
-    vidUrl:d=>d?.task?.output?.video_url
+  {
+    id:'vidu', name:'Vidu AI', model:'Vidu Q3',
+    color:'#3dffd4', free:'Free daily credits',
+    freeDetail:'<strong>Free daily credits</strong>. Fastest generation — under 10 seconds per video.',
+    tags:['Fastest','⚡ ~10s','Daily free'],
+    tagClasses:['tag-q','tag-speed','tag-free'],
+    url: p => `https://www.vidu.io/create?prompt=${enc(p)}`,
+    signup:'https://www.vidu.io',
+    quality:4, note:'Fastest generation speed'
   },
-  wan:{
-    name:'WAN 2.2',free:'100% FREE',spd:'⏳ 4–12 min',
-    dot:'#ff6b9d',apiLbl:'fal.ai Key',apiHint:'fal.ai → Sign up → API Keys. Wan 2.2 has a free tier. Open source, highest quality free model available.',
-    apiLink:'https://fal.ai',ph:'fal_xxxxxxxxxxxxxx',
-    color:'#ff6b9d',
-    ep:'https://fal.run/fal-ai/wan/v2.2/t2v',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Key ${k}`}),
-    body:(p,o)=>({prompt:ep(p,o),resolution:o.ratio==='9:16'?'480p':'720p',duration_seconds:Math.min(+o.dur,10),num_inference_steps:30}),
-    taskId:d=>d?.request_id,
-    pollUrl:id=>`https://fal.run/fal-ai/wan/v2.2/t2v/requests/${id}`,
-    done:d=>d?.status==='COMPLETED',
-    vidUrl:d=>d?.video?.url
+  {
+    id:'pixverse', name:'PixVerse', model:'PixVerse v5',
+    color:'#ffcc44', free:'Daily free credits',
+    freeDetail:'<strong>Free daily quota</strong>. Multiple styles in one click. Great for effects.',
+    tags:['Multi-Style','⚡ 30–60s','Daily free'],
+    tagClasses:['tag-q','tag-speed','tag-free'],
+    url: p => `https://app.pixverse.ai/create/text-video?prompt=${enc(p)}`,
+    signup:'https://pixverse.ai',
+    quality:4, note:'Best for visual effects & styles'
   },
-  vidu:{
-    name:'VIDU Q3',free:'FREE CREDITS',spd:'⚡ ~10 seconds',
-    dot:'#4af0ff',apiLbl:'Vidu Key',apiHint:'vidu.io → Sign up free → Developer → API Key. Fastest generation on any free platform (~10 sec).',
-    apiLink:'https://www.vidu.io',ph:'vidu_xxxxxxxxxxxxxx',
-    color:'#4af0ff',
-    ep:'https://api.vidu.studio/ent/v2/tasks',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Token ${k}`}),
-    body:(p,o)=>({type:'text2video',input:{prompt:ep(p,o),duration:Math.min(+o.dur,16),resolution:'720p',movement_amplitude:'auto'},model:'q3-pro'}),
-    taskId:d=>d?.id,
-    pollUrl:id=>`https://api.vidu.studio/ent/v2/tasks/${id}`,
-    done:d=>d?.state==='success',
-    vidUrl:d=>d?.creations?.[0]?.url
+  {
+    id:'upsampler', name:'Upsampler', model:'Wan 2.2 + LTX-2',
+    color:'#a8ff78', free:'100% FREE · No signup',
+    freeDetail:'<strong>Completely free</strong> — no account, no signup, no watermark. Uses Wan 2.2 open-source model.',
+    tags:['No Signup!','Open Source','No watermark'],
+    tagClasses:['tag-free','tag-free','tag-free'],
+    url: p => `https://upsampler.com/free-video-generator-no-signup?prompt=${enc(p)}`,
+    signup:'https://upsampler.com/free-video-generator-no-signup',
+    quality:4, note:'No account needed at all'
   },
-  pixverse:{
-    name:'PIXVERSE V5',free:'DAILY FREE',spd:'⚡ 30–60s',
-    dot:'#ffcc44',apiLbl:'PixVerse Key',apiHint:'pixverse.ai → Sign up → API Access. Free daily quota, multi-style generation.',
-    apiLink:'https://pixverse.ai',ph:'pixverse_xxxxxxxxxxxxxx',
-    color:'#ffcc44',
-    ep:'https://api.pixverse.ai/openapi/v2/video/text/generate',
-    headers:k=>({'Content-Type':'application/json','API-KEY':k}),
-    body:(p,o)=>({prompt:ep(p,o),model:'V5.5',duration:Math.min(+o.dur,8),quality:'1080p',aspect_ratio:o.ratio,motion_mode:'normal',negative_prompt:'blurry,distorted'}),
-    taskId:d=>d?.data?.video_id,
-    pollUrl:id=>`https://api.pixverse.ai/openapi/v2/video/${id}`,
-    done:d=>d?.data?.status===2,
-    vidUrl:d=>d?.data?.url
+  {
+    id:'vider', name:'Vider AI', model:'Open Source',
+    color:'#ff8c42', free:'Unlimited free · No login',
+    freeDetail:'<strong>Unlimited free</strong> image-to-video. No login at all. Just open and generate.',
+    tags:['No Login!','Unlimited','Image→Video'],
+    tagClasses:['tag-free','tag-free','tag-q'],
+    url: p => `https://vider.ai?prompt=${enc(p)}`,
+    signup:'https://vider.ai',
+    quality:3, note:'No account, unlimited image-to-video'
   },
-  ltx:{
-    name:'LTX-VIDEO 2',free:'100% FREE',spd:'⚡ Real-time',
-    dot:'#a8ff78',apiLbl:'fal.ai Key',apiHint:'fal.ai → Sign up → API Keys. LTX-Video 2 is fully open-source and runs free on fal.ai. 4K · 50fps native.',
-    apiLink:'https://fal.ai',ph:'fal_xxxxxxxxxxxxxx',
-    color:'#a8ff78',
-    ep:'https://fal.run/fal-ai/ltx-video/image-to-video',
-    headers:k=>({'Content-Type':'application/json','Authorization':`Key ${k}`}),
-    body:(p,o)=>({prompt:ep(p,o),resolution:o.ratio==='9:16'?'720x1280':'1280x720',num_frames:Math.min(+o.dur*24,200),num_inference_steps:30,guidance_scale:3.5}),
-    taskId:d=>d?.request_id,
-    pollUrl:id=>`https://fal.run/fal-ai/ltx-video/image-to-video/requests/${id}`,
-    done:d=>d?.status==='COMPLETED',
-    vidUrl:d=>d?.video?.url
+  {
+    id:'pixelbin', name:'Pixelbin', model:'Text to Video',
+    color:'#ff5fa0', free:'3 free/month · No account',
+    freeDetail:'<strong>3 free HD videos/month</strong> with no account at all. 1080p, no watermark.',
+    tags:['No Account!','1080p','No watermark'],
+    tagClasses:['tag-free','tag-q','tag-free'],
+    url: p => `https://www.pixelbin.io/ai-tools/video-generator?prompt=${enc(p)}`,
+    signup:'https://www.pixelbin.io/ai-tools/video-generator',
+    quality:3, note:'Zero account, clean 1080p output'
   }
-};
+];
 
-// style suffix map
-const styleMap={
-  cinematic:'cinematic, dramatic lighting, film grain, shallow depth of field, anamorphic lens',
-  realistic:'ultra photorealistic, 8K, hyperdetailed, natural lighting, shot on RED camera',
-  anime:'anime style, Studio Ghibli quality, vibrant colors, fluid animation',
-  '3d':'3D rendered, Octane render, volumetric lighting, ray tracing, Cinema4D',
-  documentary:'documentary style, handheld camera, natural lighting, authentic, raw',
-  noir:'film noir, black and white, hard shadows, dramatic contrast, 1940s aesthetic'
-};
+let activeId = 'kling';
+let activeStyle = 'cinematic, dramatic lighting, film grain';
 
-function ep(p,o){return `${p}, ${styleMap[o.style]||''}, high quality, smooth motion`.trim()}
+function enc(p){ return encodeURIComponent(p) }
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let cur='kling',enhOn=true,gen=false,vidUrl=null,poll=null;
-
-// ── Select platform ───────────────────────────────────────────────────────────
-function sel(id){
-  cur=id;const c=P[id];
-  // chips
-  document.querySelectorAll('.pchip').forEach(x=>x.classList.remove('on'));
-  document.querySelector(`.pchip[data-id="${id}"]`).classList.add('on');
-  // table rows
-  document.querySelectorAll('.ctbl tr[id]').forEach(x=>x.classList.remove('sel'));
-  document.getElementById(`tr-${id}`).classList.add('sel');
-  // engine bar
-  document.getElementById('en-name').textContent=c.name;
-  document.getElementById('en-free').textContent=c.free;
-  document.getElementById('en-spd').textContent=c.spd;
-  // api
-  document.getElementById('api-dot').style.background=c.dot;
-  document.getElementById('api-lbl').textContent=c.apiLbl;
-  document.getElementById('api-key').placeholder=c.ph;
-  document.getElementById('api-get').href=c.apiLink;
-  document.getElementById('api-hint').textContent=c.apiHint;
-  // panel top color
-  document.getElementById('left-panel').style.setProperty('--active-color',c.color);
-  log(`// Switched to ${c.name}`,'in');
+// ── Build engine grid ─────────────────────────────────────────────────────────
+function buildGrid(){
+  const g = document.getElementById('engine-grid');
+  g.innerHTML = '';
+  ENGINES.forEach(e => {
+    const d = document.createElement('div');
+    d.className = 'ecard' + (e.id===activeId?' on':'');
+    d.style.setProperty('--ec', e.color);
+    d.dataset.id = e.id;
+    d.innerHTML = `
+      <div class="ecard-top">
+        <div>
+          <div class="ecard-name">${e.name}</div>
+          <div class="ecard-model">${e.model}</div>
+        </div>
+        <div class="ecard-check">${e.id===activeId?'✓':''}</div>
+      </div>
+      <div class="ecard-tags">
+        ${e.tags.map((t,i)=>`<span class="tag ${e.tagClasses[i]}">${t}</span>`).join('')}
+      </div>
+      <div class="ecard-free-detail">${e.freeDetail}</div>
+    `;
+    d.onclick = () => selectEngine(e.id);
+    g.appendChild(d);
+  });
 }
 
-// ── Enhance toggle ────────────────────────────────────────────────────────────
-function togEnhance(){enhOn=!enhOn;document.getElementById('etog').classList.toggle('on',enhOn)}
-
-// ── Log ───────────────────────────────────────────────────────────────────────
-function log(msg,cls='ok'){
-  const b=document.getElementById('log');
-  const t=new Date().toLocaleTimeString('en-US',{hour12:false});
-  const d=document.createElement('div');
-  d.className=`ll ${cls}`;d.textContent=`[${t}] ${msg}`;
-  b.appendChild(d);b.scrollTop=b.scrollHeight;
+// ── Select engine ─────────────────────────────────────────────────────────────
+function selectEngine(id){
+  activeId = id;
+  const e = ENGINES.find(x=>x.id===id);
+  // update cards
+  document.querySelectorAll('.ecard').forEach(c=>{
+    const on = c.dataset.id===id;
+    c.classList.toggle('on',on);
+    c.querySelector('.ecard-check').textContent = on?'✓':'';
+  });
+  // update active bar
+  document.getElementById('active-dot').style.cssText = `background:${e.color};box-shadow:0 0 10px ${e.color}`;
+  document.getElementById('active-name').textContent = e.name.toUpperCase();
+  document.getElementById('active-free').textContent = e.free + ' · ' + e.note;
+  toast(`Switched to ${e.name}`, 'inf');
 }
 
-// ── Progress ──────────────────────────────────────────────────────────────────
-function setP(pct,lbl){
-  document.getElementById('prog').style.display='block';
-  document.getElementById('pfill').style.width=pct+'%';
-  document.getElementById('prog-pct').textContent=pct+'%';
-  document.getElementById('prog-lbl').textContent=lbl;
-}
-function hideP(){document.getElementById('prog').style.display='none'}
-
-// ── Generate ──────────────────────────────────────────────────────────────────
-async function generate(){
-  if(gen)return;
-  const prompt=document.getElementById('prompt').value.trim();
-  const apiKey=document.getElementById('api-key').value.trim();
-  const style=document.getElementById('style').value;
-  const dur=document.getElementById('dur').value;
-  const ratio=document.getElementById('ratio').value;
-  if(!prompt){toast('Please enter a prompt!','er');return}
-  if(!apiKey){toast('Please enter your API key!','er');return}
-
-  const c=P[cur];gen=true;
-  document.getElementById('gbtn').disabled=true;
-  document.getElementById('gbtn-txt').textContent='GENERATING…';
-  document.getElementById('spin').style.display='block';
-  document.getElementById('dl-btn').disabled=true;
-  document.getElementById('vplayer').style.display='none';
-  document.getElementById('vph').style.display='flex';
-  vidUrl=null;
-
-  log(`Starting ${c.name}…`);setP(5,'Connecting…');
-
-  try{
-    let fp=prompt;
-    if(enhOn){fp=ep(prompt,{style,dur,ratio});log(`Prompt enhanced for ${c.name}`,'in')}
-    setP(15,`Sending to ${c.name}…`);log(`Sending request…`);
-
-    const res=await fetch(c.ep,{method:'POST',headers:c.headers(apiKey),body:JSON.stringify(c.body(fp,{style,dur,ratio}))});
-    if(!res.ok){const e=await res.text();throw new Error(`API ${res.status}: ${e.substring(0,120)}`)}
-    const data=await res.json();
-    const taskId=c.taskId(data);
-    if(!taskId)throw new Error('No task ID returned. Check your API key.');
-
-    log(`Task created: ${taskId}`);setP(30,'Video rendering…');
-
-    let attempts=0;const max=80;
-    poll=setInterval(async()=>{
-      attempts++;
-      const pct=Math.min(30+attempts/max*62,92);
-      setP(Math.round(pct),`Rendering… (${attempts*5}s elapsed)`);
-      try{
-        const pr=await fetch(c.pollUrl(taskId),{headers:c.headers(apiKey)});
-        const pd=await pr.json();
-        if(c.done(pd)){
-          clearInterval(poll);
-          const url=c.vidUrl(pd);
-          if(url){setP(100,'Complete!');log('✅ Video ready!');showVid(url)}
-          else throw new Error('Video URL missing in response.');
-        }else if(attempts>=max){clearInterval(poll);throw new Error('Timed out after 6 minutes.')}
-        else if(attempts%6===0)log(`Still rendering… (${attempts*5}s)`,'in');
-      }catch(pe){if(attempts>=max){clearInterval(poll);err(pe.message)}}
-    },5000);
-  }catch(e){err(e.message)}
+// ── Style chips ───────────────────────────────────────────────────────────────
+function addStyle(btn, styleText){
+  document.querySelectorAll('.schip').forEach(s=>s.classList.remove('on'));
+  btn.classList.add('on');
+  activeStyle = styleText;
+  toast('Style updated','inf');
 }
 
-function showVid(url){
-  vidUrl=url;gen=false;
-  const v=document.getElementById('vplayer');
-  v.src=url;v.style.display='block';
-  document.getElementById('vph').style.display='none';
-  document.getElementById('gbtn').disabled=false;
-  document.getElementById('gbtn-txt').textContent='GENERATE VIDEO';
-  document.getElementById('spin').style.display='none';
-  document.getElementById('dl-btn').disabled=false;
-  toast('🎉 Video ready!','ok');
-  setTimeout(hideP,2000);
+// ── Build final prompt ────────────────────────────────────────────────────────
+function buildPrompt(){
+  const base = document.getElementById('prompt').value.trim();
+  if(!base) return '';
+  return `${base}, ${activeStyle}, high quality`;
 }
 
-function err(msg){
-  gen=false;
-  document.getElementById('gbtn').disabled=false;
-  document.getElementById('gbtn-txt').textContent='GENERATE VIDEO';
-  document.getElementById('spin').style.display='none';
-  hideP();log(`❌ ${msg}`,'er');toast('Generation failed — see log','er');
+// ── Launch ────────────────────────────────────────────────────────────────────
+function launch(){
+  const p = buildPrompt();
+  if(!p){ toast('Please enter a prompt first!','er'); return; }
+  const e = ENGINES.find(x=>x.id===activeId);
+  const url = e.url(p);
+  toast(`Opening ${e.name}…`,'inf');
+  setTimeout(()=>{ window.open(url,'_blank'); }, 300);
+}
+
+// ── Tips ──────────────────────────────────────────────────────────────────────
+function addTip(el){
+  const ta = document.getElementById('prompt');
+  const val = ta.value.trim();
+  const word = el.textContent.trim();
+  ta.value = val ? val + ', ' + word : word;
+  updateCount();
+  toast(`Added "${word}"`, 'inf');
+}
+
+// ── Quick ideas ───────────────────────────────────────────────────────────────
+function useIdea(el){
+  const text = el.textContent.replace(/^[^\s]+\s/,'');
+  document.getElementById('prompt').value = text;
+  updateCount();
+  document.getElementById('prompt').focus();
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function dlVideo(){if(!vidUrl)return;const a=document.createElement('a');a.href=vidUrl;a.download=`rvid_${cur}_${Date.now()}.mp4`;a.click()}
-function copyPrompt(){const p=document.getElementById('prompt').value;if(!p){toast('No prompt to copy','er');return}navigator.clipboard.writeText(p);toast('Prompt copied!','ok')}
-function clearAll(){
-  if(poll)clearInterval(poll);gen=false;vidUrl=null;
+function updateCount(){
+  const len = document.getElementById('prompt').value.length;
+  document.getElementById('ccount').textContent = `${len} / 500`;
+}
+
+function copyPrompt(){
+  const p = buildPrompt();
+  if(!p){ toast('No prompt to copy','er'); return; }
+  navigator.clipboard.writeText(p).then(()=>toast('Prompt copied!','ok'));
+}
+
+function clearPrompt(){
   document.getElementById('prompt').value='';
-  document.getElementById('vplayer').style.display='none';
-  document.getElementById('vph').style.display='flex';
-  document.getElementById('gbtn').disabled=false;
-  document.getElementById('gbtn-txt').textContent='GENERATE VIDEO';
-  document.getElementById('spin').style.display='none';
-  document.getElementById('dl-btn').disabled=true;
-  document.getElementById('log').innerHTML='<div class="ll in">// Cleared — ready for new generation</div>';
-  hideP();
+  updateCount();
+  toast('Cleared','inf');
 }
-function useQ(el){document.getElementById('prompt').value=el.textContent.replace(/^.\s/,'');document.getElementById('prompt').focus()}
-function toast(msg,cls='ok'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className=`toast ${cls} show`;
-  setTimeout(()=>t.classList.remove('show'),3200);
+
+function toast(msg, cls='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${cls} show`;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>t.classList.remove('show'), 2800);
 }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+buildGrid();
 </script>
 </body>
 </html>
