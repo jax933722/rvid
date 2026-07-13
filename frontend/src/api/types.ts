@@ -118,3 +118,20 @@ export interface SearchResult {
   page: number;
   page_size: number;
 }
+
+export interface DiscoveredBusiness {
+  name: string;
+  category: string;
+  website: string | null;
+  website_url: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  postal_code: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  source_url: string | null;
+  company_id: number | null;
+}

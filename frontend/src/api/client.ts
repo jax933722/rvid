@@ -4,6 +4,7 @@ import type {
   Company,
   CompanyTechnology,
   CrawlJob,
+  DiscoveredBusiness,
   Page,
   SearchRequest,
   SearchResult,
@@ -71,4 +72,13 @@ export const api = {
 
   reindexCompany: (id: number) =>
     request<{ status: string }>(`/companies/${id}/index`, { method: "POST" }),
+
+  discover: (category: string, location: string, limit = 50) =>
+    request<DiscoveredBusiness[]>("/discover", {
+      method: "POST",
+      body: JSON.stringify({ category, location, limit }),
+    }),
+
+  enrichCompany: (id: number) =>
+    request<{ status: string; company_id: number }>(`/companies/${id}/enrich`, { method: "POST" }),
 };

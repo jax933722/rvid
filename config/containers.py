@@ -10,6 +10,7 @@ from __future__ import annotations
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from bise.application.ports.discovery import DiscoverySourcePort
 from bise.application.ports.fetcher import PageFetcherPort
 from bise.application.ports.html_parser import HtmlParserPort
 from bise.application.ports.marketing_detector import MarketingDetectorPort
@@ -23,6 +24,7 @@ from bise.application.use_cases.companies.list_companies import ListCompanies
 from bise.application.use_cases.crawling.get_crawl_job import GetCrawlJob
 from bise.application.use_cases.crawling.list_crawl_jobs import ListCrawlJobs
 from bise.application.use_cases.crawling.request_crawl import RequestCrawl
+from bise.application.use_cases.discovery.discover_businesses import DiscoverBusinesses
 from bise.application.use_cases.enrichment.detect_marketing import DetectMarketing
 from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
 from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
@@ -40,6 +42,7 @@ from bise.infrastructure.crawling.html_parser import BeautifulSoupHtmlParser
 from bise.infrastructure.crawling.httpx_fetcher import FetcherConfig, HttpxPageFetcher
 from bise.infrastructure.db.engine import create_db_engine, create_session_factory
 from bise.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
+from bise.infrastructure.discovery.overpass_source import OverpassDiscoverySource
 from bise.infrastructure.pagespeed.null_provider import NullPageSpeedProvider
 from bise.infrastructure.search.sql_search_adapter import SqlSearchAdapter
 from config.settings import Settings, get_settings
@@ -59,6 +62,7 @@ class Container:
         self._page_speed: PageSpeedPort | None = None
         self._search_index: SearchIndexPort | None = None
         self._marketing_detector: MarketingDetectorPort | None = None
+        self._discovery_source: DiscoverySourcePort | None = None
 
     def unit_of_work(self) -> SqlAlchemyUnitOfWork:
         """Create a fresh Unit of Work (one transactional scope per use case call)."""
@@ -86,6 +90,11 @@ class Container:
         if self._marketing_detector is None:
             self._marketing_detector = RuleBasedMarketingDetector()
         return self._marketing_detector
+
+    def discovery_source(self) -> DiscoverySourcePort:
+        if self._discovery_source is None:
+            self._discovery_source = OverpassDiscoverySource()
+        return self._discovery_source
 
     def seo_analyzer(self) -> SeoAnalyzerPort:
         if self._seo_analyzer is None:
@@ -135,6 +144,9 @@ class Container:
 
     def list_company_marketing(self) -> ListCompanyMarketing:
         return ListCompanyMarketing(self.unit_of_work())
+
+    def discover_businesses(self) -> DiscoverBusinesses:
+        return DiscoverBusinesses(self.unit_of_work(), self.discovery_source())
 
     def run_seo_scan(self) -> RunSeoScan:
         return RunSeoScan(self.unit_of_work(), self.seo_analyzer(), self.page_speed())

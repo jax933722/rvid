@@ -17,6 +17,7 @@ from bise.presentation.api.errors import register_exception_handlers
 from bise.presentation.api.routers import (
     companies,
     crawlers,
+    discovery,
     health,
     marketing,
     search,
@@ -47,6 +48,7 @@ def create_app(container: Container | None = None) -> FastAPI:
     app.include_router(seo.router, prefix=API_PREFIX)
     app.include_router(search.router, prefix=API_PREFIX)
     app.include_router(marketing.router, prefix=API_PREFIX)
+    app.include_router(discovery.router, prefix=API_PREFIX)
     return app
 
 

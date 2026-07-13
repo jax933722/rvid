@@ -3,6 +3,7 @@ import { Layout } from "@/components/Layout";
 import { CompanyDetailsPage } from "@/pages/CompanyDetails";
 import { CrawlerMonitorPage } from "@/pages/CrawlerMonitor";
 import { DashboardPage } from "@/pages/Dashboard";
+import { DiscoverPage } from "@/pages/Discover";
 import { SearchPage } from "@/pages/Search";
 import { SettingsPage } from "@/pages/Settings";
 
@@ -11,6 +12,7 @@ export function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
+        <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/companies/:id" element={<CompanyDetailsPage />} />
         <Route path="/crawlers" element={<CrawlerMonitorPage />} />
