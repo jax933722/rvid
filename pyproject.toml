@@ -100,6 +100,15 @@ markers = [
 source = ["bise"]
 branch = true
 
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "\\.\\.\\.",            # Protocol / abstract method bodies
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
 # ---------------------------------------------------------------------------
 # import-linter — enforces the Clean Architecture dependency rule (doc 2, 3)
 # ---------------------------------------------------------------------------

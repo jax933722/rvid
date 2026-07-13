@@ -8,7 +8,7 @@ PIP := $(VENV)/bin/pip
 
 LINT_PATHS := src tests config
 
-.PHONY: help venv install lint format typecheck arch test cov check up down migrate serve clean
+.PHONY: help venv install lint format typecheck arch test cov cov-gate check up down migrate serve clean
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -42,7 +42,11 @@ test: ## Run the test suite
 cov: ## Run tests with coverage
 	$(VENV)/bin/pytest --cov=bise --cov-report=term-missing
 
-check: lint typecheck arch test ## Run all quality gates (what CI runs)
+cov-gate: ## Enforce coverage on the domain + application layers (>= 90%)
+	$(VENV)/bin/pytest --cov=bise.domain --cov=bise.application \
+		--cov-report=term-missing --cov-fail-under=90
+
+check: lint typecheck arch cov-gate ## Run all quality gates (what CI runs)
 
 up: ## Start local Postgres + Redis
 	docker compose up -d
