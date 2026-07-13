@@ -13,8 +13,14 @@ Every decision in these documents is justified against one constraint above all:
 
 ## Deliverables Index
 
+> **Start here:** [phase-1-design.md](./phase-1-design.md) is the authoritative
+> reconciliation of the refined 10-module spec (Company Intelligence, Business
+> Classification, SQLite+Postgres, saved searches/bookmarks/exports, concrete frontend
+> stack). Docs 01–10 below provide the underlying depth it references.
+
 | # | Document | Purpose |
 |---|----------|---------|
+| ★ | [phase-1-design.md](./phase-1-design.md) | Phase 1 deliverable: refined spec reconciled — modules, schema, ER, API, layout |
 | 1 | [01-system-architecture.md](./01-system-architecture.md) | High-level component diagram (Mermaid) of the whole platform |
 | 2 | [02-clean-architecture.md](./02-clean-architecture.md) | The four layers and their responsibilities |
 | 3 | [03-folder-structure.md](./03-folder-structure.md) | Complete repository layout, every folder justified |
