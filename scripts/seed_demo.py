@@ -4,16 +4,24 @@ Populates companies, crawled pages, technologies, SEO profiles, marketing
 signals, and the search projection directly through the repositories (no live
 crawling), so the UI has realistic content to render.
 
-Usage:
-    BISE_DATABASE_URL=sqlite:///./demo.db .venv/bin/python scripts/seed_demo.py
+Usage (from the repo root, with the venv active):
+    python scripts/seed_demo.py
 """
 
+# ruff: noqa: E402  (sys.path bootstrap must run before the project imports)
 from __future__ import annotations
+
+import pathlib
+import sys
+
+# Make the repo root importable so `config` resolves when run as a script.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from dataclasses import dataclass
 
 from config.containers import Container
 from config.logging import configure_logging
+
 from bise.application.dto.company_dto import CreateCompanyCommand, NewDomainDTO
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage, PageType
@@ -30,37 +38,81 @@ class Demo:
     industry: str
     size: str
     host: str
-    techs: list[tuple[str, str]]        # (name, category)
+    techs: list[tuple[str, str]]  # (name, category)
     seo_score: float
     pages: list[PageType]
-    marketing: list[tuple[str, str]]    # (tool, category)
+    marketing: list[tuple[str, str]]  # (tool, category)
 
 
 DEMOS = [
-    Demo("Acme Dental", "Dentistry", "11-50", "acmedental.com",
-         [("WordPress", "CMS"), ("Meta Pixel", "Marketing Pixel"), ("Google Analytics 4", "Analytics")],
-         42.0, [PageType.CONTACT, PageType.CAREERS],
-         [("Meta Pixel", "Marketing Pixel"), ("WhatsApp", "Messaging")]),
-    Demo("BrightSmile Orthodontics", "Dentistry", "1-10", "brightsmile.com",
-         [("WordPress", "CMS"), ("Google Tag Manager", "Tag Manager")],
-         88.0, [PageType.CONTACT, PageType.BLOG],
-         [("Google Tag Manager", "Tag Manager"), ("Calendly", "Appointment Booking")]),
-    Demo("Coastal Plumbing", "Plumbing", "11-50", "coastalplumbing.com.au",
-         [("Shopify", "E-commerce")], 71.0, [PageType.CONTACT],
-         [("Mailchimp", "Lead / Newsletter Form")]),
-    Demo("Nimbus Software", "Software", "51-200", "nimbus.io",
-         [("React", "JavaScript Framework"), ("Next.js", "JavaScript Framework"),
-          ("Google Analytics 4", "Analytics")],
-         93.0, [PageType.CAREERS, PageType.BLOG],
-         [("Google Analytics 4", "Analytics"), ("Intercom", "Chat / Widget")]),
-    Demo("GreenLeaf Cafe", "Hospitality", "1-10", "greenleaf.cafe",
-         [("WordPress", "CMS"), ("WooCommerce", "E-commerce")],
-         56.0, [PageType.CONTACT],
-         [("OneTrust", "Cookie / Consent")]),
-    Demo("Urban Fitness", "Fitness", "11-50", "urbanfitness.co",
-         [("Shopify", "E-commerce"), ("Meta Pixel", "Marketing Pixel")],
-         64.0, [PageType.CONTACT, PageType.CAREERS],
-         [("Meta Pixel", "Marketing Pixel"), ("TikTok Pixel", "Marketing Pixel")]),
+    Demo(
+        "Acme Dental",
+        "Dentistry",
+        "11-50",
+        "acmedental.com",
+        [
+            ("WordPress", "CMS"),
+            ("Meta Pixel", "Marketing Pixel"),
+            ("Google Analytics 4", "Analytics"),
+        ],
+        42.0,
+        [PageType.CONTACT, PageType.CAREERS],
+        [("Meta Pixel", "Marketing Pixel"), ("WhatsApp", "Messaging")],
+    ),
+    Demo(
+        "BrightSmile Orthodontics",
+        "Dentistry",
+        "1-10",
+        "brightsmile.com",
+        [("WordPress", "CMS"), ("Google Tag Manager", "Tag Manager")],
+        88.0,
+        [PageType.CONTACT, PageType.BLOG],
+        [("Google Tag Manager", "Tag Manager"), ("Calendly", "Appointment Booking")],
+    ),
+    Demo(
+        "Coastal Plumbing",
+        "Plumbing",
+        "11-50",
+        "coastalplumbing.com.au",
+        [("Shopify", "E-commerce")],
+        71.0,
+        [PageType.CONTACT],
+        [("Mailchimp", "Lead / Newsletter Form")],
+    ),
+    Demo(
+        "Nimbus Software",
+        "Software",
+        "51-200",
+        "nimbus.io",
+        [
+            ("React", "JavaScript Framework"),
+            ("Next.js", "JavaScript Framework"),
+            ("Google Analytics 4", "Analytics"),
+        ],
+        93.0,
+        [PageType.CAREERS, PageType.BLOG],
+        [("Google Analytics 4", "Analytics"), ("Intercom", "Chat / Widget")],
+    ),
+    Demo(
+        "GreenLeaf Cafe",
+        "Hospitality",
+        "1-10",
+        "greenleaf.cafe",
+        [("WordPress", "CMS"), ("WooCommerce", "E-commerce")],
+        56.0,
+        [PageType.CONTACT],
+        [("OneTrust", "Cookie / Consent")],
+    ),
+    Demo(
+        "Urban Fitness",
+        "Fitness",
+        "11-50",
+        "urbanfitness.co",
+        [("Shopify", "E-commerce"), ("Meta Pixel", "Marketing Pixel")],
+        64.0,
+        [PageType.CONTACT, PageType.CAREERS],
+        [("Meta Pixel", "Marketing Pixel"), ("TikTok Pixel", "Marketing Pixel")],
+    ),
 ]
 
 
@@ -128,20 +180,30 @@ def seed() -> None:
                 assert tech.id is not None
                 links.append(
                     CompanyTechnology(
-                        company_id=company_id, technology_id=tech.id,
-                        confidence=Confidence(0.9), evidence="seed", technology=tech,
+                        company_id=company_id,
+                        technology_id=tech.id,
+                        confidence=Confidence(0.9),
+                        evidence="seed",
+                        technology=tech,
                     )
                 )
             uow.company_technologies.replace_for_company(company_id, links)
 
             uow.seo_profiles.upsert(
-                SeoProfile(company_id=company_id, signals=_seo_signals(demo.host, demo.seo_score),
-                           score=demo.seo_score)
+                SeoProfile(
+                    company_id=company_id,
+                    signals=_seo_signals(demo.host, demo.seo_score),
+                    score=demo.seo_score,
+                )
             )
             uow.marketing_signals.replace_for_company(
                 company_id,
-                [MarketingSignal(company_id=company_id, tool_name=name, category=cat, evidence="seed")
-                 for name, cat in demo.marketing],
+                [
+                    MarketingSignal(
+                        company_id=company_id, tool_name=name, category=cat, evidence="seed"
+                    )
+                    for name, cat in demo.marketing
+                ],
             )
             uow.commit()
 
