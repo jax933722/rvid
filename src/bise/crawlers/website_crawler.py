@@ -134,6 +134,8 @@ class WebsiteCrawler:
             content_type=fetched.content_type,
             title=title,
             content_hash=_content_hash(fetched.html),
+            html=fetched.html or None,
+            headers=dict(fetched.headers),
         )
         return _FetchResult(fetched=fetched, page=page)
 

@@ -7,7 +7,7 @@ Robots and rate-limiting are the fetcher's responsibility, hidden behind it.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Protocol
 
 
@@ -21,6 +21,7 @@ class FetchedPage:
     html: str = ""
     content_type: str | None = None
     elapsed_ms: int = 0
+    headers: dict[str, str] = field(default_factory=dict)
 
     @property
     def is_html(self) -> bool:

@@ -12,6 +12,7 @@ from typing import Protocol
 from bise.domain.entities.company import Company
 from bise.domain.entities.crawl_job import CrawlJob, CrawlJobStatus
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.technology import CompanyTechnology, Technology
 from bise.domain.entities.website_domain import CrawlStatus
 from bise.shared.pagination import Page, PageRequest
 
@@ -69,4 +70,32 @@ class CrawledPageRepository(Protocol):
 
     def list_for_job(self, crawl_job_id: int) -> list[CrawledPage]:
         """Return all pages recorded for a crawl job."""
+        ...
+
+    def list_for_domain(self, domain_id: int) -> list[CrawledPage]:
+        """Return all pages recorded for a domain (used by enrichment analyzers)."""
+        ...
+
+
+class TechnologyRepository(Protocol):
+    """Persistence for canonical :class:`Technology` reference data."""
+
+    def get_or_create(self, name: str, category: str, vendor: str | None = None) -> Technology:
+        """Return the technology with this name, creating it (and category) if new."""
+        ...
+
+    def list(self, page: PageRequest) -> Page[Technology]:
+        """Return a page of known technologies ordered by name."""
+        ...
+
+
+class CompanyTechnologyRepository(Protocol):
+    """Persistence for company↔technology detections."""
+
+    def replace_for_company(self, company_id: int, detections: list[CompanyTechnology]) -> None:
+        """Replace all detections for a company (idempotent re-detection)."""
+        ...
+
+    def list_for_company(self, company_id: int) -> list[CompanyTechnology]:
+        """Return all technologies detected for a company (with technology loaded)."""
         ...

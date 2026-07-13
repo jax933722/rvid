@@ -17,6 +17,9 @@ from bise.application.use_cases.companies.list_companies import ListCompanies
 from bise.application.use_cases.crawling.get_crawl_job import GetCrawlJob
 from bise.application.use_cases.crawling.list_crawl_jobs import ListCrawlJobs
 from bise.application.use_cases.crawling.request_crawl import RequestCrawl
+from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
+from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
+from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 
 
 def get_container(request: Request) -> Container:
@@ -50,3 +53,15 @@ def get_list_crawl_jobs(container: ContainerDep) -> ListCrawlJobs:
 
 def get_get_crawl_job(container: ContainerDep) -> GetCrawlJob:
     return container.get_crawl_job()
+
+
+def get_detect_technologies(container: ContainerDep) -> DetectTechnologies:
+    return container.detect_technologies()
+
+
+def get_list_company_technologies(container: ContainerDep) -> ListCompanyTechnologies:
+    return container.list_company_technologies()
+
+
+def get_list_technologies(container: ContainerDep) -> ListTechnologies:
+    return container.list_technologies()

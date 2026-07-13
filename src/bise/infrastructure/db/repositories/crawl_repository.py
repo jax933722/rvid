@@ -28,6 +28,23 @@ def _job_to_entity(model: CrawlJobModel) -> CrawlJob:
     )
 
 
+def _page_to_entity(model: CrawledPageModel) -> CrawledPage:
+    return CrawledPage(
+        id=model.id,
+        crawl_job_id=model.crawl_job_id,
+        domain_id=model.domain_id,
+        url=model.url,
+        page_type=PageType(model.page_type),
+        http_status=model.http_status,
+        content_type=model.content_type,
+        title=model.title,
+        content_hash=model.content_hash,
+        html=model.html,
+        headers=model.headers or {},
+        fetched_at=model.fetched_at,
+    )
+
+
 def _apply_job(entity: CrawlJob, model: CrawlJobModel) -> None:
     model.status = entity.status.value
     model.attempts = entity.attempts
@@ -109,6 +126,8 @@ class SqlAlchemyCrawledPageRepository:
             content_type=page.content_type,
             title=page.title,
             content_hash=page.content_hash,
+            html=page.html,
+            headers=page.headers or None,
             fetched_at=page.fetched_at,
         )
         self._session.add(model)
@@ -122,18 +141,12 @@ class SqlAlchemyCrawledPageRepository:
             .where(CrawledPageModel.crawl_job_id == crawl_job_id)
             .order_by(CrawledPageModel.id)
         )
-        return [
-            CrawledPage(
-                id=m.id,
-                crawl_job_id=m.crawl_job_id,
-                domain_id=m.domain_id,
-                url=m.url,
-                page_type=PageType(m.page_type),
-                http_status=m.http_status,
-                content_type=m.content_type,
-                title=m.title,
-                content_hash=m.content_hash,
-                fetched_at=m.fetched_at,
-            )
-            for m in self._session.scalars(stmt).all()
-        ]
+        return [_page_to_entity(m) for m in self._session.scalars(stmt).all()]
+
+    def list_for_domain(self, domain_id: int) -> list[CrawledPage]:
+        stmt = (
+            select(CrawledPageModel)
+            .where(CrawledPageModel.domain_id == domain_id)
+            .order_by(CrawledPageModel.id)
+        )
+        return [_page_to_entity(m) for m in self._session.scalars(stmt).all()]

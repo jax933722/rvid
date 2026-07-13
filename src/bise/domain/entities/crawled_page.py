@@ -34,6 +34,8 @@ class CrawledPage:
     content_hash: str
     content_type: str | None = None
     title: str | None = None
+    html: str | None = None
+    headers: dict[str, str] = field(default_factory=dict)
     crawl_job_id: int | None = None
     domain_id: int | None = None
     id: int | None = field(default=None)

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from bise.infrastructure.db.base import Base, TimestampMixin
@@ -47,4 +47,6 @@ class CrawledPageModel(TimestampMixin, Base):
     content_type: Mapped[str | None] = mapped_column(String(128))
     title: Mapped[str | None] = mapped_column(String(1024))
     content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    html: Mapped[str | None] = mapped_column(Text)
+    headers: Mapped[dict[str, str] | None] = mapped_column(JSON)
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

@@ -88,6 +88,7 @@ class HttpxPageFetcher:
             content_type = response.headers.get("content-type", "").split(";")[0] or None
             is_html = (content_type or "").startswith("text/html")
             body = response.text[: self._config.max_response_bytes] if is_html else ""
+            headers = {k.lower(): v for k, v in response.headers.items()}
             return FetchedPage(
                 url=str(response.url),
                 status_code=response.status_code,
@@ -95,6 +96,7 @@ class HttpxPageFetcher:
                 html=body,
                 content_type=content_type,
                 elapsed_ms=elapsed_ms,
+                headers=headers,
             )
 
         logger.warning("fetch.failed", url=url, error=last_error)

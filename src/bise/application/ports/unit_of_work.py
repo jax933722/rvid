@@ -11,8 +11,10 @@ from typing import Protocol
 
 from bise.application.ports.repositories import (
     CompanyRepository,
+    CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
+    TechnologyRepository,
 )
 
 
@@ -22,6 +24,8 @@ class UnitOfWork(Protocol):
     companies: CompanyRepository
     crawl_jobs: CrawlJobRepository
     crawled_pages: CrawledPageRepository
+    technologies: TechnologyRepository
+    company_technologies: CompanyTechnologyRepository
 
     def __enter__(self) -> UnitOfWork: ...
 
