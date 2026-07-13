@@ -1,0 +1,119 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bise"
+version = "0.1.0"
+description = "Business Intelligence Search Engine — indexes and enriches business websites at scale."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "BISE Team" }]
+
+# Runtime dependencies are declared here as the project grows milestone by milestone.
+# Milestone 1 introduces no runtime code, so this list is intentionally minimal.
+dependencies = [
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "structlog>=24.1",
+]
+
+[project.optional-dependencies]
+# Installed in the dev/CI environment only.
+dev = [
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "import-linter>=2.0",
+    "pre-commit>=3.7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bise"]
+
+# ---------------------------------------------------------------------------
+# Ruff — single authority for lint + format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle + pyflakes
+    "I",              # isort (import ordering)
+    "N",              # pep8-naming (enforces naming conventions, doc 9)
+    "UP",             # pyupgrade
+    "B",              # flake8-bugbear
+    "SIM",            # flake8-simplify
+    "T20",            # flake8-print (no print in src)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests and scripts may use print / assertions freely.
+"tests/**" = ["T20"]
+"scripts/**" = ["T20"]
+
+# ---------------------------------------------------------------------------
+# mypy — strict typing on the codebase
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+mypy_path = "src"
+explicit_package_bases = true
+namespace_packages = true
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "unit: fast, no-I/O tests (domain + application)",
+    "integration: tests against real Postgres/Redis",
+    "contract: shared port contract suites",
+    "e2e: black-box API tests",
+]
+
+[tool.coverage.run]
+source = ["bise"]
+branch = true
+
+# ---------------------------------------------------------------------------
+# import-linter — enforces the Clean Architecture dependency rule (doc 2, 3)
+# ---------------------------------------------------------------------------
+[tool.importlinter]
+root_package = "bise"
+
+[[tool.importlinter.contracts]]
+name = "Clean Architecture layers (dependencies point inward)"
+type = "layers"
+layers = [
+    "bise.presentation",
+    "bise.crawlers",
+    "bise.infrastructure",
+    "bise.application",
+    "bise.domain",
+]
+
+[[tool.importlinter.contracts]]
+name = "Domain is framework-free"
+type = "forbidden"
+source_modules = ["bise.domain"]
+forbidden_modules = [
+    "bise.application",
+    "bise.infrastructure",
+    "bise.presentation",
+    "bise.crawlers",
+]
