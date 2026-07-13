@@ -61,29 +61,38 @@ python scripts/seed_demo.py   # optional: 6 demo companies to explore
 make serve        # starts the API at http://localhost:8000
 ```
 
-### Option B — manual (any OS)
+### Option B — manual, macOS/Linux
 
 ```bash
 # from the repo root
 python3 -m venv .venv
-
-# activate the venv:
-#   macOS/Linux:
 source .venv/bin/activate
-#   Windows PowerShell:
-#   .venv\Scripts\Activate.ps1
-
 pip install -U pip
 pip install -e ".[dev]"
-
-# create the database (SQLite file: bise.db)
-alembic upgrade head
-
-# optional: load 6 demo companies so the UI has content
-python scripts/seed_demo.py
-
-# run the API
+alembic upgrade head                 # creates bise.db
+python scripts/seed_demo.py          # optional demo data
 uvicorn bise.presentation.api.main:app --reload
+```
+
+### Option C — manual, Windows
+
+Use `python` (NOT `python3` — on Windows `python3` opens the Microsoft Store).
+
+**Command Prompt (cmd.exe):**
+```bat
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install -U pip
+pip install -e ".[dev]"
+alembic upgrade head
+python scripts\seed_demo.py
+uvicorn bise.presentation.api.main:app --reload
+```
+
+**PowerShell** — same, but activate with:
+```powershell
+.\.venv\Scripts\Activate.ps1
+# if blocked once: Set-ExecutionPolicy -Scope Process RemoteSigned
 ```
 
 Backend is now at **http://localhost:8000**. Check it:
