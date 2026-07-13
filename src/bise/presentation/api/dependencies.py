@@ -22,6 +22,8 @@ from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
+from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
+from bise.application.use_cases.search.search_companies import SearchCompanies
 
 
 def get_container(request: Request) -> Container:
@@ -75,3 +77,11 @@ def get_run_seo_scan(container: ContainerDep) -> RunSeoScan:
 
 def get_get_company_seo(container: ContainerDep) -> GetCompanySeo:
     return container.get_company_seo()
+
+
+def get_search_companies(container: ContainerDep) -> SearchCompanies:
+    return container.search_companies()
+
+
+def get_rebuild_search_document(container: ContainerDep) -> RebuildSearchDocument:
+    return container.rebuild_search_document()

@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from bise.application.ports.fetcher import PageFetcherPort
 from bise.application.ports.html_parser import HtmlParserPort
 from bise.application.ports.page_speed import PageSpeedPort
+from bise.application.ports.search import SearchIndexPort
 from bise.application.ports.seo_analyzer import SeoAnalyzerPort
 from bise.application.ports.technology_detector import TechnologyDetectorPort
 from bise.application.use_cases.companies.create_company import CreateCompany
@@ -26,6 +27,8 @@ from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
+from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
+from bise.application.use_cases.search.search_companies import SearchCompanies
 from bise.crawlers.website_crawler import WebsiteCrawler
 from bise.infrastructure.analyzers.seo_analyzer import BeautifulSoupSeoAnalyzer
 from bise.infrastructure.analyzers.tech_fingerprint import RuleBasedTechnologyDetector
@@ -34,6 +37,7 @@ from bise.infrastructure.crawling.httpx_fetcher import FetcherConfig, HttpxPageF
 from bise.infrastructure.db.engine import create_db_engine, create_session_factory
 from bise.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
 from bise.infrastructure.pagespeed.null_provider import NullPageSpeedProvider
+from bise.infrastructure.search.sql_search_adapter import SqlSearchAdapter
 from config.settings import Settings, get_settings
 
 
@@ -49,6 +53,7 @@ class Container:
         self._tech_detector: TechnologyDetectorPort | None = None
         self._seo_analyzer: SeoAnalyzerPort | None = None
         self._page_speed: PageSpeedPort | None = None
+        self._search_index: SearchIndexPort | None = None
 
     def unit_of_work(self) -> SqlAlchemyUnitOfWork:
         """Create a fresh Unit of Work (one transactional scope per use case call)."""
@@ -81,6 +86,11 @@ class Container:
         if self._page_speed is None:
             self._page_speed = NullPageSpeedProvider()
         return self._page_speed
+
+    def search_index(self) -> SearchIndexPort:
+        if self._search_index is None:
+            self._search_index = SqlSearchAdapter(self.session_factory)
+        return self._search_index
 
     # --- Use case factories (a new UoW per call keeps sessions request-scoped) ---
     def create_company(self) -> CreateCompany:
@@ -115,6 +125,12 @@ class Container:
 
     def get_company_seo(self) -> GetCompanySeo:
         return GetCompanySeo(self.unit_of_work())
+
+    def search_companies(self) -> SearchCompanies:
+        return SearchCompanies(self.search_index())
+
+    def rebuild_search_document(self) -> RebuildSearchDocument:
+        return RebuildSearchDocument(self.unit_of_work(), self.search_index())
 
     def website_crawler(self) -> WebsiteCrawler:
         return WebsiteCrawler(

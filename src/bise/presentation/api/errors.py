@@ -6,7 +6,7 @@ from config.logging import get_logger
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from bise.application.errors import ConflictError, NotFoundError
+from bise.application.errors import ApplicationError, ConflictError, NotFoundError
 from bise.domain.errors import DomainError
 from bise.presentation.api.schemas.common import ProblemDetail
 
@@ -29,6 +29,11 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(ConflictError)
     async def _handle_conflict(request: Request, exc: ConflictError) -> JSONResponse:
         return _problem(409, "Conflict", str(exc), request)
+
+    @app.exception_handler(ApplicationError)
+    async def _handle_application_error(request: Request, exc: ApplicationError) -> JSONResponse:
+        # e.g. an invalid search filter field/operator from compile_query.
+        return _problem(422, "Unprocessable Entity", str(exc), request)
 
     @app.exception_handler(DomainError)
     async def _handle_domain_error(request: Request, exc: DomainError) -> JSONResponse:
