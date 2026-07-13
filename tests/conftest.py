@@ -15,6 +15,7 @@ from config.containers import Container
 from config.settings import Settings
 from fastapi.testclient import TestClient
 
+import bise.infrastructure.db.models  # noqa: F401  (registers all tables on Base.metadata)
 from bise.infrastructure.db.base import Base
 from bise.presentation.api.main import create_app
 

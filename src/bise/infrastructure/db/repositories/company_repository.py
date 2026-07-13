@@ -93,3 +93,10 @@ class SqlAlchemyCompanyRepository:
             page=page.page,
             page_size=page.page_size,
         )
+
+    def mark_domain_crawl_status(self, domain_id: int, status: CrawlStatus) -> None:
+        model = self._session.get(DomainModel, domain_id)
+        if model is None:
+            raise KeyError(f"Domain not found: {domain_id}")
+        model.crawl_status = status.value
+        self._session.flush()

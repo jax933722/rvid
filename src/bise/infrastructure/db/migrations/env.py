@@ -12,10 +12,9 @@ from alembic import context
 from config.settings import get_settings
 from sqlalchemy import engine_from_config, pool
 
+# Import the models package so every table registers on Base.metadata.
+import bise.infrastructure.db.models  # noqa: F401
 from bise.infrastructure.db.base import Base
-
-# Import models so their tables register on Base.metadata.
-from bise.infrastructure.db.models import company as _company  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:

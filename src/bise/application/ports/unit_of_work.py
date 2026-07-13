@@ -9,13 +9,19 @@ from __future__ import annotations
 from types import TracebackType
 from typing import Protocol
 
-from bise.application.ports.repositories import CompanyRepository
+from bise.application.ports.repositories import (
+    CompanyRepository,
+    CrawledPageRepository,
+    CrawlJobRepository,
+)
 
 
 class UnitOfWork(Protocol):
     """A transactional scope exposing the repositories it coordinates."""
 
     companies: CompanyRepository
+    crawl_jobs: CrawlJobRepository
+    crawled_pages: CrawledPageRepository
 
     def __enter__(self) -> UnitOfWork: ...
 

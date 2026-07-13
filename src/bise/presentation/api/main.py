@@ -14,7 +14,7 @@ from fastapi import FastAPI
 
 from bise import __version__
 from bise.presentation.api.errors import register_exception_handlers
-from bise.presentation.api.routers import companies, health
+from bise.presentation.api.routers import companies, crawlers, health
 
 API_PREFIX = "/api/v1"
 
@@ -34,6 +34,7 @@ def create_app(container: Container | None = None) -> FastAPI:
     register_exception_handlers(app)
     app.include_router(health.router, prefix=API_PREFIX)
     app.include_router(companies.router, prefix=API_PREFIX)
+    app.include_router(crawlers.router, prefix=API_PREFIX)
     return app
 
 

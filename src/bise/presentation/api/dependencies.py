@@ -14,6 +14,9 @@ from fastapi import Depends, Request
 from bise.application.use_cases.companies.create_company import CreateCompany
 from bise.application.use_cases.companies.get_company import GetCompany
 from bise.application.use_cases.companies.list_companies import ListCompanies
+from bise.application.use_cases.crawling.get_crawl_job import GetCrawlJob
+from bise.application.use_cases.crawling.list_crawl_jobs import ListCrawlJobs
+from bise.application.use_cases.crawling.request_crawl import RequestCrawl
 
 
 def get_container(request: Request) -> Container:
@@ -35,3 +38,15 @@ def get_get_company(container: ContainerDep) -> GetCompany:
 
 def get_list_companies(container: ContainerDep) -> ListCompanies:
     return container.list_companies()
+
+
+def get_request_crawl(container: ContainerDep) -> RequestCrawl:
+    return container.request_crawl()
+
+
+def get_list_crawl_jobs(container: ContainerDep) -> ListCrawlJobs:
+    return container.list_crawl_jobs()
+
+
+def get_get_crawl_job(container: ContainerDep) -> GetCrawlJob:
+    return container.get_crawl_job()
