@@ -6,7 +6,9 @@ VENV := .venv
 PY := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 
-.PHONY: help venv install lint format typecheck arch test cov check up down clean
+LINT_PATHS := src tests config
+
+.PHONY: help venv install lint format typecheck arch test cov check up down migrate serve clean
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -22,14 +24,14 @@ install: $(VENV) ## Install the package + dev tooling (editable)
 	$(PIP) install -e ".[dev]"
 
 lint: ## Lint with ruff (check only)
-	$(VENV)/bin/ruff check src tests
+	$(VENV)/bin/ruff check $(LINT_PATHS)
 
 format: ## Auto-format with ruff
-	$(VENV)/bin/ruff format src tests
-	$(VENV)/bin/ruff check --fix src tests
+	$(VENV)/bin/ruff format $(LINT_PATHS)
+	$(VENV)/bin/ruff check --fix $(LINT_PATHS)
 
 typecheck: ## Static type-check with mypy
-	$(VENV)/bin/mypy src
+	$(VENV)/bin/mypy src config
 
 arch: ## Enforce Clean Architecture dependency rule
 	$(VENV)/bin/lint-imports
@@ -47,6 +49,12 @@ up: ## Start local Postgres + Redis
 
 down: ## Stop local services
 	docker compose down
+
+migrate: ## Apply database migrations (alembic upgrade head)
+	$(VENV)/bin/alembic upgrade head
+
+serve: ## Run the API locally with autoreload
+	$(VENV)/bin/uvicorn bise.presentation.api.main:app --reload
 
 clean: ## Remove caches and build artifacts
 	rm -rf .pytest_cache .mypy_cache .ruff_cache dist build *.egg-info

@@ -21,6 +21,10 @@ htmlcov/
 .env
 *.local
 
+# Local databases
+*.db
+*.sqlite3
+
 # OS / editor
 .DS_Store
 .idea/

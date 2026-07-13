@@ -22,10 +22,10 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Lint (ruff)
-        run: ruff check src tests
+        run: ruff check src tests config
 
       - name: Type-check (mypy)
-        run: mypy src
+        run: mypy src config
 
       - name: Architecture rule (import-linter)
         run: lint-imports
