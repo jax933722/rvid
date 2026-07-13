@@ -11,6 +11,7 @@ from bise.application.ports.repositories import (
     CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
+    MarketingSignalRepository,
     SeoProfileRepository,
     TechnologyRepository,
 )
@@ -18,6 +19,9 @@ from bise.infrastructure.db.repositories.company_repository import SqlAlchemyCom
 from bise.infrastructure.db.repositories.crawl_repository import (
     SqlAlchemyCrawledPageRepository,
     SqlAlchemyCrawlJobRepository,
+)
+from bise.infrastructure.db.repositories.marketing_repository import (
+    SqlAlchemyMarketingSignalRepository,
 )
 from bise.infrastructure.db.repositories.seo_repository import SqlAlchemySeoProfileRepository
 from bise.infrastructure.db.repositories.technology_repository import (
@@ -43,6 +47,7 @@ class SqlAlchemyUnitOfWork:
         self.technologies: TechnologyRepository
         self.company_technologies: CompanyTechnologyRepository
         self.seo_profiles: SeoProfileRepository
+        self.marketing_signals: MarketingSignalRepository
 
     def __enter__(self) -> SqlAlchemyUnitOfWork:
         self._session = self._session_factory()
@@ -52,6 +57,7 @@ class SqlAlchemyUnitOfWork:
         self.technologies = SqlAlchemyTechnologyRepository(self._session)
         self.company_technologies = SqlAlchemyCompanyTechnologyRepository(self._session)
         self.seo_profiles = SqlAlchemySeoProfileRepository(self._session)
+        self.marketing_signals = SqlAlchemyMarketingSignalRepository(self._session)
         return self
 
     def __exit__(

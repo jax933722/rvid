@@ -14,6 +14,7 @@ from bise.application.ports.repositories import (
     CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
+    MarketingSignalRepository,
     SeoProfileRepository,
     TechnologyRepository,
 )
@@ -28,6 +29,7 @@ class UnitOfWork(Protocol):
     technologies: TechnologyRepository
     company_technologies: CompanyTechnologyRepository
     seo_profiles: SeoProfileRepository
+    marketing_signals: MarketingSignalRepository
 
     def __enter__(self) -> UnitOfWork: ...
 

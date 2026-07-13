@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from bise.application.dto.company_dto import CompanyDTO, DomainDTO
 from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
+from bise.application.dto.marketing_dto import MarketingSignalDTO
 from bise.application.dto.seo_dto import SeoProfileDTO
 from bise.application.dto.technology_dto import CompanyTechnologyDTO, TechnologyDTO
 from bise.domain.entities.company import Company
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.marketing_signal import MarketingSignal
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
 
@@ -103,6 +105,16 @@ def seo_profile_to_dto(profile: SeoProfile) -> SeoProfileDTO:
         cwv_cls=profile.cwv_cls,
         cwv_inp_ms=profile.cwv_inp_ms,
         scanned_at=profile.scanned_at,
+    )
+
+
+def marketing_signal_to_dto(signal: MarketingSignal) -> MarketingSignalDTO:
+    """Convert a :class:`MarketingSignal` entity into its boundary DTO."""
+    return MarketingSignalDTO(
+        tool_name=signal.tool_name,
+        category=signal.category,
+        evidence=signal.evidence,
+        detected_at=signal.detected_at,
     )
 
 

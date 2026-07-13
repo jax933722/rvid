@@ -12,6 +12,7 @@ from typing import Protocol
 from bise.domain.entities.company import Company
 from bise.domain.entities.crawl_job import CrawlJob, CrawlJobStatus
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.marketing_signal import MarketingSignal
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
 from bise.domain.entities.website_domain import CrawlStatus
@@ -99,6 +100,18 @@ class CompanyTechnologyRepository(Protocol):
 
     def list_for_company(self, company_id: int) -> list[CompanyTechnology]:
         """Return all technologies detected for a company (with technology loaded)."""
+        ...
+
+
+class MarketingSignalRepository(Protocol):
+    """Persistence for company marketing detections."""
+
+    def replace_for_company(self, company_id: int, signals: list[MarketingSignal]) -> None:
+        """Replace all marketing signals for a company (idempotent re-detection)."""
+        ...
+
+    def list_for_company(self, company_id: int) -> list[MarketingSignal]:
+        """Return all marketing tools detected for a company."""
         ...
 
 

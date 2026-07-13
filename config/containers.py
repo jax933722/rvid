@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from bise.application.ports.fetcher import PageFetcherPort
 from bise.application.ports.html_parser import HtmlParserPort
+from bise.application.ports.marketing_detector import MarketingDetectorPort
 from bise.application.ports.page_speed import PageSpeedPort
 from bise.application.ports.search import SearchIndexPort
 from bise.application.ports.seo_analyzer import SeoAnalyzerPort
@@ -22,14 +23,17 @@ from bise.application.use_cases.companies.list_companies import ListCompanies
 from bise.application.use_cases.crawling.get_crawl_job import GetCrawlJob
 from bise.application.use_cases.crawling.list_crawl_jobs import ListCrawlJobs
 from bise.application.use_cases.crawling.request_crawl import RequestCrawl
+from bise.application.use_cases.enrichment.detect_marketing import DetectMarketing
 from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
 from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
+from bise.application.use_cases.enrichment.list_company_marketing import ListCompanyMarketing
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
 from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
 from bise.application.use_cases.search.search_companies import SearchCompanies
 from bise.crawlers.website_crawler import WebsiteCrawler
+from bise.infrastructure.analyzers.marketing_fingerprint import RuleBasedMarketingDetector
 from bise.infrastructure.analyzers.seo_analyzer import BeautifulSoupSeoAnalyzer
 from bise.infrastructure.analyzers.tech_fingerprint import RuleBasedTechnologyDetector
 from bise.infrastructure.crawling.html_parser import BeautifulSoupHtmlParser
@@ -54,6 +58,7 @@ class Container:
         self._seo_analyzer: SeoAnalyzerPort | None = None
         self._page_speed: PageSpeedPort | None = None
         self._search_index: SearchIndexPort | None = None
+        self._marketing_detector: MarketingDetectorPort | None = None
 
     def unit_of_work(self) -> SqlAlchemyUnitOfWork:
         """Create a fresh Unit of Work (one transactional scope per use case call)."""
@@ -76,6 +81,11 @@ class Container:
         if self._tech_detector is None:
             self._tech_detector = RuleBasedTechnologyDetector()
         return self._tech_detector
+
+    def marketing_detector(self) -> MarketingDetectorPort:
+        if self._marketing_detector is None:
+            self._marketing_detector = RuleBasedMarketingDetector()
+        return self._marketing_detector
 
     def seo_analyzer(self) -> SeoAnalyzerPort:
         if self._seo_analyzer is None:
@@ -119,6 +129,12 @@ class Container:
 
     def list_technologies(self) -> ListTechnologies:
         return ListTechnologies(self.unit_of_work())
+
+    def detect_marketing(self) -> DetectMarketing:
+        return DetectMarketing(self.unit_of_work(), self.marketing_detector())
+
+    def list_company_marketing(self) -> ListCompanyMarketing:
+        return ListCompanyMarketing(self.unit_of_work())
 
     def run_seo_scan(self) -> RunSeoScan:
         return RunSeoScan(self.unit_of_work(), self.seo_analyzer(), self.page_speed())
