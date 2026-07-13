@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from bise.application.dto.company_dto import CompanyDTO, DomainDTO
 from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
+from bise.application.dto.seo_dto import SeoProfileDTO
 from bise.application.dto.technology_dto import CompanyTechnologyDTO, TechnologyDTO
 from bise.domain.entities.company import Company
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
 
 
@@ -71,6 +73,36 @@ def technology_to_dto(technology: Technology) -> TechnologyDTO:
         name=technology.name,
         category=technology.category,
         vendor=technology.vendor,
+    )
+
+
+def seo_profile_to_dto(profile: SeoProfile) -> SeoProfileDTO:
+    """Convert a :class:`SeoProfile` entity into its boundary DTO."""
+    s = profile.signals
+    return SeoProfileDTO(
+        url=s.url,
+        score=profile.score,
+        grade=profile.grade,
+        title=s.title,
+        meta_description=s.meta_description,
+        canonical=s.canonical,
+        meta_robots=s.meta_robots,
+        is_indexable=s.is_indexable,
+        h1_count=s.h1_count,
+        h2_count=s.h2_count,
+        has_open_graph=s.has_open_graph,
+        has_twitter_card=s.has_twitter_card,
+        has_structured_data=s.has_structured_data,
+        has_ssl=s.has_ssl,
+        images_total=s.images_total,
+        images_missing_alt=s.images_missing_alt,
+        internal_links=s.internal_links,
+        external_links=s.external_links,
+        word_count=s.word_count,
+        cwv_lcp_ms=profile.cwv_lcp_ms,
+        cwv_cls=profile.cwv_cls,
+        cwv_inp_ms=profile.cwv_inp_ms,
+        scanned_at=profile.scanned_at,
     )
 
 

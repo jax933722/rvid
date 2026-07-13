@@ -14,6 +14,7 @@ from bise.application.ports.repositories import (
     CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
+    SeoProfileRepository,
     TechnologyRepository,
 )
 
@@ -26,6 +27,7 @@ class UnitOfWork(Protocol):
     crawled_pages: CrawledPageRepository
     technologies: TechnologyRepository
     company_technologies: CompanyTechnologyRepository
+    seo_profiles: SeoProfileRepository
 
     def __enter__(self) -> UnitOfWork: ...
 

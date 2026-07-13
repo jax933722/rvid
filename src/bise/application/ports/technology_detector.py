@@ -8,17 +8,12 @@ future ML/other detector is a drop-in replacement behind this same interface.
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Protocol
 
+from bise.application.ports.page_content import PageContent
 
-@dataclass(frozen=True, slots=True)
-class PageContent:
-    """The raw material a detector inspects for one page."""
-
-    url: str
-    html: str = ""
-    headers: dict[str, str] = field(default_factory=dict)
+__all__ = ["PageContent", "TechDetection", "TechnologyDetectorPort"]
 
 
 @dataclass(frozen=True, slots=True)

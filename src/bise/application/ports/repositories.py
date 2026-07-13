@@ -12,6 +12,7 @@ from typing import Protocol
 from bise.domain.entities.company import Company
 from bise.domain.entities.crawl_job import CrawlJob, CrawlJobStatus
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
 from bise.domain.entities.website_domain import CrawlStatus
 from bise.shared.pagination import Page, PageRequest
@@ -98,4 +99,16 @@ class CompanyTechnologyRepository(Protocol):
 
     def list_for_company(self, company_id: int) -> list[CompanyTechnology]:
         """Return all technologies detected for a company (with technology loaded)."""
+        ...
+
+
+class SeoProfileRepository(Protocol):
+    """Persistence for a company's SEO profile (one current profile per company)."""
+
+    def upsert(self, profile: SeoProfile) -> SeoProfile:
+        """Insert or replace the company's SEO profile."""
+        ...
+
+    def get_for_company(self, company_id: int) -> SeoProfile | None:
+        """Return the company's current SEO profile, if scanned."""
         ...

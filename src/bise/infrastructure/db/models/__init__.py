@@ -7,6 +7,7 @@ import order.
 
 from bise.infrastructure.db.models.company import CompanyModel, DomainModel
 from bise.infrastructure.db.models.crawl import CrawledPageModel, CrawlJobModel
+from bise.infrastructure.db.models.seo import SeoProfileModel
 from bise.infrastructure.db.models.technology import (
     CompanyTechnologyModel,
     TechnologyCategoryModel,
@@ -19,6 +20,7 @@ __all__ = [
     "CrawlJobModel",
     "CrawledPageModel",
     "DomainModel",
+    "SeoProfileModel",
     "TechnologyCategoryModel",
     "TechnologyModel",
 ]

@@ -12,6 +12,8 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from bise.application.ports.fetcher import PageFetcherPort
 from bise.application.ports.html_parser import HtmlParserPort
+from bise.application.ports.page_speed import PageSpeedPort
+from bise.application.ports.seo_analyzer import SeoAnalyzerPort
 from bise.application.ports.technology_detector import TechnologyDetectorPort
 from bise.application.use_cases.companies.create_company import CreateCompany
 from bise.application.use_cases.companies.get_company import GetCompany
@@ -20,14 +22,18 @@ from bise.application.use_cases.crawling.get_crawl_job import GetCrawlJob
 from bise.application.use_cases.crawling.list_crawl_jobs import ListCrawlJobs
 from bise.application.use_cases.crawling.request_crawl import RequestCrawl
 from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
+from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
+from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
 from bise.crawlers.website_crawler import WebsiteCrawler
+from bise.infrastructure.analyzers.seo_analyzer import BeautifulSoupSeoAnalyzer
 from bise.infrastructure.analyzers.tech_fingerprint import RuleBasedTechnologyDetector
 from bise.infrastructure.crawling.html_parser import BeautifulSoupHtmlParser
 from bise.infrastructure.crawling.httpx_fetcher import FetcherConfig, HttpxPageFetcher
 from bise.infrastructure.db.engine import create_db_engine, create_session_factory
 from bise.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
+from bise.infrastructure.pagespeed.null_provider import NullPageSpeedProvider
 from config.settings import Settings, get_settings
 
 
@@ -41,6 +47,8 @@ class Container:
         self._fetcher: PageFetcherPort | None = None
         self._html_parser: HtmlParserPort | None = None
         self._tech_detector: TechnologyDetectorPort | None = None
+        self._seo_analyzer: SeoAnalyzerPort | None = None
+        self._page_speed: PageSpeedPort | None = None
 
     def unit_of_work(self) -> SqlAlchemyUnitOfWork:
         """Create a fresh Unit of Work (one transactional scope per use case call)."""
@@ -63,6 +71,16 @@ class Container:
         if self._tech_detector is None:
             self._tech_detector = RuleBasedTechnologyDetector()
         return self._tech_detector
+
+    def seo_analyzer(self) -> SeoAnalyzerPort:
+        if self._seo_analyzer is None:
+            self._seo_analyzer = BeautifulSoupSeoAnalyzer()
+        return self._seo_analyzer
+
+    def page_speed(self) -> PageSpeedPort:
+        if self._page_speed is None:
+            self._page_speed = NullPageSpeedProvider()
+        return self._page_speed
 
     # --- Use case factories (a new UoW per call keeps sessions request-scoped) ---
     def create_company(self) -> CreateCompany:
@@ -91,6 +109,12 @@ class Container:
 
     def list_technologies(self) -> ListTechnologies:
         return ListTechnologies(self.unit_of_work())
+
+    def run_seo_scan(self) -> RunSeoScan:
+        return RunSeoScan(self.unit_of_work(), self.seo_analyzer(), self.page_speed())
+
+    def get_company_seo(self) -> GetCompanySeo:
+        return GetCompanySeo(self.unit_of_work())
 
     def website_crawler(self) -> WebsiteCrawler:
         return WebsiteCrawler(

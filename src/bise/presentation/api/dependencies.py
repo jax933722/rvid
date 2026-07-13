@@ -18,8 +18,10 @@ from bise.application.use_cases.crawling.get_crawl_job import GetCrawlJob
 from bise.application.use_cases.crawling.list_crawl_jobs import ListCrawlJobs
 from bise.application.use_cases.crawling.request_crawl import RequestCrawl
 from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
+from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
+from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
 
 
 def get_container(request: Request) -> Container:
@@ -65,3 +67,11 @@ def get_list_company_technologies(container: ContainerDep) -> ListCompanyTechnol
 
 def get_list_technologies(container: ContainerDep) -> ListTechnologies:
     return container.list_technologies()
+
+
+def get_run_seo_scan(container: ContainerDep) -> RunSeoScan:
+    return container.run_seo_scan()
+
+
+def get_get_company_seo(container: ContainerDep) -> GetCompanySeo:
+    return container.get_company_seo()
