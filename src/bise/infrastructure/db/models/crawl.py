@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from bise.infrastructure.db.base import Base, TimestampMixin
@@ -14,6 +14,8 @@ class CrawlJobModel(TimestampMixin, Base):
     """``crawl_jobs`` table — one unit of crawl work targeting a domain."""
 
     __tablename__ = "crawl_jobs"
+    # Queue picking + monitor listing both scan by status ordered by age.
+    __table_args__ = (Index("ix_crawljobs_status_created", "status", "created_at"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     domain_id: Mapped[int] = mapped_column(

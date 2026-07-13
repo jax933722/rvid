@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from bise.infrastructure.db.base import Base, TimestampMixin
@@ -14,6 +14,13 @@ class SearchDocumentModel(TimestampMixin, Base):
     """``search_documents`` table — one searchable row per company."""
 
     __tablename__ = "search_documents"
+    # Composite indexes matching the common Sales-Navigator filter combinations
+    # (industry + SEO-score range, grade + score). Single-column indexes below
+    # still serve queries that use only one facet.
+    __table_args__ = (
+        Index("ix_search_industry_score", "industry", "seo_score"),
+        Index("ix_search_grade_score", "seo_grade", "seo_score"),
+    )
 
     company_id: Mapped[int] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), primary_key=True

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import DateTime, Float, ForeignKey, Index, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from bise.infrastructure.db.base import Base, TimestampMixin
@@ -41,6 +41,9 @@ class CompanyTechnologyModel(TimestampMixin, Base):
     __tablename__ = "company_technologies"
     __table_args__ = (
         UniqueConstraint("company_id", "technology_id", name="uq_company_technology"),
+        # "Which companies use technology X" — the future reverse-lookup facet,
+        # answered by a single index scan even at millions of rows.
+        Index("ix_comptech_tech_company", "technology_id", "company_id"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -40,5 +40,29 @@ Copy `.env.example` to `.env` for local configuration. Never commit secrets.
 
 ## Status
 
-Milestone 1 — repository scaffolding & tooling. See the
-[roadmap](./docs/architecture/10-roadmap.md) for the milestone plan.
+All build phases complete (design → backend → crawler → tech detection → SEO →
+search → frontend → testing → optimization):
+
+- **Backend**: FastAPI + SQLAlchemy, Clean Architecture across
+  domain/application/infrastructure/presentation; SQLite (dev) / PostgreSQL
+  (prod) behind one URL; 7 Alembic migrations (all reversible).
+- **Pipeline**: discover → crawl (robots-aware) → detect technologies → SEO scan
+  → build search projection, all fixture-tested with no live network in CI.
+- **Search**: Sales-Navigator-style faceted search behind a swappable
+  `SearchIndexPort` (portable SQL now; Postgres FTS / OpenSearch later).
+- **Frontend**: React + Vite + TypeScript + Tailwind SPA (typecheck + build in CI).
+- **Quality**: 157 tests, mypy `--strict`, import-linter enforcing the dependency
+  rule, port contract suites, and a 90% coverage gate on domain + application.
+
+Run the whole system locally: `make install && make migrate && make serve`
+(backend) and `npm install && npm run dev` in [`frontend/`](./frontend).
+
+See the [architecture dossier](./docs/architecture/README.md) and the
+[roadmap](./docs/architecture/10-roadmap.md).
+
+### Future modules (designed for, not yet built)
+
+Marketing scanner, business classifier, location extractor, and company
+intelligence each have a reserved port/table seam (see
+[phase-1-design.md](./docs/architecture/phase-1-design.md)); email finder,
+verification, auth, and multi-tenancy remain explicitly out of scope.

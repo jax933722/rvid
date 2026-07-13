@@ -31,6 +31,7 @@ Every decision in these documents is justified against one constraint above all:
 | 8 | [08-frontend-architecture.md](./08-frontend-architecture.md) | Page hierarchy and component design |
 | 9 | [09-coding-standards.md](./09-coding-standards.md) | Naming, errors, logging, config, DI, testing |
 | 10 | [10-roadmap.md](./10-roadmap.md) | ~50 session-sized milestones |
+| 11 | [11-optimization-and-scale.md](./11-optimization-and-scale.md) | Phase 9: indexes added, text-search limitation, partitioning + adapter-swap scale path |
 
 ## Guiding Principles (applied throughout)
 
