@@ -125,6 +125,8 @@ class SqlSearchAdapter:
 
         column: InstrumentedAttribute[Any] = getattr(_M, p.field)
         if p.kind is FieldKind.NUMBER:
+            if p.op is FilterOp.BETWEEN:
+                return column.between(float(p.values[0]), float(p.values[1]))
             value = float(p.values[0])
             if p.op is FilterOp.GTE:
                 return column >= value
@@ -160,6 +162,11 @@ class SqlSearchAdapter:
             primary_domain=model.primary_domain,
             industry=model.industry,
             country=model.country,
+            state=model.state,
+            city=model.city,
+            size_bucket=model.size_bucket,
+            founded_year=model.founded_year,
+            employee_count=model.employee_count,
             seo_score=model.seo_score,
             seo_grade=model.seo_grade,
             technologies=list(model.technologies or []),

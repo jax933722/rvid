@@ -18,6 +18,7 @@ class FilterOp(StrEnum):
     IN = "in"
     GTE = "gte"
     LTE = "lte"
+    BETWEEN = "between"  # numeric inclusive range: exactly two values (min, max)
     CONTAINS = "contains"  # list membership (any-of)
     IS_TRUE = "is_true"
 
@@ -60,6 +61,11 @@ class SearchResultItem:
     primary_domain: str | None
     industry: str | None
     country: str | None
+    state: str | None
+    city: str | None
+    size_bucket: str | None
+    founded_year: int | None
+    employee_count: int | None
     seo_score: float | None
     seo_grade: str | None
     technologies: list[str]
