@@ -155,6 +155,28 @@ export interface CompanyTag {
   created_at: string;
 }
 
+export interface Workspace {
+  id: number | null;
+  name: string;
+  slug: string;
+  created_at: string;
+}
+
+export interface ApiKey {
+  id: number | null;
+  workspace_id: number;
+  name: string;
+  prefix: string;
+  revoked: boolean;
+  last_used_at: string | null;
+  created_at: string;
+}
+
+export interface CreatedApiKey {
+  api_key: ApiKey;
+  secret: string;
+}
+
 export interface EnrichmentJob {
   id: number | null;
   company_id: number;

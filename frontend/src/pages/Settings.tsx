@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/api/client";
 import { Badge, Card } from "@/components/ui";
+import { ApiKeysPanel } from "@/features/auth/ApiKeysPanel";
 import { useTheme } from "@/hooks/useTheme";
 
 export function SettingsPage() {
@@ -37,6 +38,8 @@ export function SettingsPage() {
           )}
         </div>
       </Card>
+
+      <ApiKeysPanel />
 
       <Card>
         <h2 className="mb-2 font-semibold">Crawler configuration</h2>

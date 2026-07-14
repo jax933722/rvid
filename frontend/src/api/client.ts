@@ -1,11 +1,13 @@
 // Typed client for the Search API. The only place the frontend talks HTTP.
 
 import type {
+  ApiKey,
   Company,
   CompanyList,
   CompanyTag,
   CompanyTechnology,
   CrawlJob,
+  CreatedApiKey,
   DiscoveredBusiness,
   EnqueueResult,
   Page,
@@ -15,6 +17,7 @@ import type {
   SearchResult,
   SeoProfile,
   Technology,
+  Workspace,
 } from "./types";
 
 const BASE = "/api/v1";
@@ -178,4 +181,14 @@ export const api = {
 
   runEnrichment: (maxJobs = 10) =>
     request<{ processed: number }>(`/enrichment/run?max_jobs=${maxJobs}`, { method: "POST" }),
+
+  // --- auth: current workspace + API keys ---
+  whoami: () => request<Workspace>("/auth/whoami"),
+
+  listApiKeys: () => request<ApiKey[]>("/api-keys"),
+
+  createApiKey: (name: string) =>
+    request<CreatedApiKey>("/api-keys", { method: "POST", body: JSON.stringify({ name }) }),
+
+  revokeApiKey: (id: number) => request<void>(`/api-keys/${id}`, { method: "DELETE" }),
 };
