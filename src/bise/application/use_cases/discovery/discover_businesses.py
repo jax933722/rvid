@@ -47,7 +47,14 @@ class DiscoverBusinesses:
                     if existing is not None:
                         company_id = existing.id
                     else:
-                        company = Company(display_name=biz.name, industry=biz.category)
+                        company = Company(
+                            display_name=biz.name,
+                            industry=biz.category,
+                            country=biz.country,
+                            state=biz.state,
+                            city=biz.city,
+                            contact_phone=biz.phone,
+                        )
                         company.add_domain(WebsiteDomain(hostname=biz.website, is_primary=True))
                         saved = uow.companies.add(company)
                         company_id = saved.id

@@ -27,6 +27,8 @@ class SearchDocument:
     state: str | None = None
     city: str | None = None
     size_bucket: str | None = None
+    founded_year: int | None = None
+    employee_count: int | None = None
     seo_score: float | None = None
     seo_grade: str | None = None
     technologies: list[str] = field(default_factory=list)

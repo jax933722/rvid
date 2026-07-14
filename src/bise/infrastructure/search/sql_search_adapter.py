@@ -64,6 +64,8 @@ class SqlSearchAdapter:
         model.state = doc.state
         model.city = doc.city
         model.size_bucket = doc.size_bucket
+        model.founded_year = doc.founded_year
+        model.employee_count = doc.employee_count
         model.seo_score = doc.seo_score
         model.seo_grade = doc.seo_grade
         model.technologies = doc.technologies

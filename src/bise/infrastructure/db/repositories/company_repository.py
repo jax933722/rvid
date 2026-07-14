@@ -23,6 +23,13 @@ def _to_entity(model: CompanyModel) -> Company:
         status=CompanyStatus(model.status),
         industry=model.industry,
         size_bucket=model.size_bucket,
+        country=model.country,
+        state=model.state,
+        city=model.city,
+        founded_year=model.founded_year,
+        employee_count=model.employee_count,
+        contact_email=model.contact_email,
+        contact_phone=model.contact_phone,
         created_at=model.created_at,
         updated_at=model.updated_at,
         domains=[
@@ -44,6 +51,13 @@ def _to_model(entity: Company) -> CompanyModel:
         status=entity.status.value,
         industry=entity.industry,
         size_bucket=entity.size_bucket,
+        country=entity.country,
+        state=entity.state,
+        city=entity.city,
+        founded_year=entity.founded_year,
+        employee_count=entity.employee_count,
+        contact_email=entity.contact_email,
+        contact_phone=entity.contact_phone,
         domains=[
             DomainModel(
                 hostname=d.hostname,

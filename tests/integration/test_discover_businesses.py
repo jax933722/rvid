@@ -49,7 +49,11 @@ def test_saves_businesses_with_websites_as_companies(container: Container) -> No
     assert next(r for r in results if r.website is None).company_id is None
 
     with container.unit_of_work() as uow:
-        assert uow.companies.find_by_hostname("acmedental.com") is not None
+        acme = uow.companies.find_by_hostname("acmedental.com")
+        assert acme is not None
+        # Location firmographics from the discovery source are persisted.
+        assert acme.city == "Sydney"
+        assert acme.industry == "dentist"
         assert uow.companies.find_by_hostname("brightdental.com") is not None
 
 

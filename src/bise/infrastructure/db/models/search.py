@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from bise.infrastructure.db.base import Base, TimestampMixin
@@ -32,6 +32,8 @@ class SearchDocumentModel(TimestampMixin, Base):
     state: Mapped[str | None] = mapped_column(String(128), index=True)
     city: Mapped[str | None] = mapped_column(String(128), index=True)
     size_bucket: Mapped[str | None] = mapped_column(String(32), index=True)
+    founded_year: Mapped[int | None] = mapped_column(Integer, index=True)
+    employee_count: Mapped[int | None] = mapped_column(Integer, index=True)
     seo_score: Mapped[float | None] = mapped_column(Float, index=True)
     seo_grade: Mapped[str | None] = mapped_column(String(1), index=True)
     technologies: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)

@@ -24,6 +24,13 @@ def company_to_dto(company: Company) -> CompanyDTO:
         status=company.status.value,
         industry=company.industry,
         size_bucket=company.size_bucket,
+        country=company.country,
+        state=company.state,
+        city=company.city,
+        founded_year=company.founded_year,
+        employee_count=company.employee_count,
+        contact_email=company.contact_email,
+        contact_phone=company.contact_phone,
         domains=tuple(
             DomainDTO(
                 id=d.id,

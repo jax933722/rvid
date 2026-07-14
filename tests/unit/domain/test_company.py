@@ -46,3 +46,30 @@ def test_enrich_succeeds_with_domain() -> None:
     company.add_domain(WebsiteDomain(hostname="acme.com"))
     company.mark_enriched()
     assert company.status is CompanyStatus.ENRICHED
+
+
+def test_accepts_firmographics() -> None:
+    company = Company(
+        display_name="Acme",
+        country="Australia",
+        state="NSW",
+        city="Sydney",
+        founded_year=1999,
+        employee_count=42,
+        contact_email="hello@acme.com",
+        contact_phone="+61 2 9000 0000",
+    )
+    assert company.city == "Sydney"
+    assert company.founded_year == 1999
+    assert company.employee_count == 42
+
+
+@pytest.mark.parametrize("year", [1799, 3000])
+def test_rejects_founded_year_out_of_range(year: int) -> None:
+    with pytest.raises(InvalidValueError):
+        Company(display_name="Acme", founded_year=year)
+
+
+def test_rejects_negative_employee_count() -> None:
+    with pytest.raises(InvalidValueError):
+        Company(display_name="Acme", employee_count=-1)

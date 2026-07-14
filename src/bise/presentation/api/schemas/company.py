@@ -60,6 +60,13 @@ class CompanyResponse(BaseModel):
     status: str
     industry: str | None
     size_bucket: str | None
+    country: str | None
+    state: str | None
+    city: str | None
+    founded_year: int | None
+    employee_count: int | None
+    contact_email: str | None
+    contact_phone: str | None
     domains: list[DomainResponse]
     created_at: datetime
     updated_at: datetime
@@ -74,6 +81,13 @@ class CompanyResponse(BaseModel):
             status=dto.status,
             industry=dto.industry,
             size_bucket=dto.size_bucket,
+            country=dto.country,
+            state=dto.state,
+            city=dto.city,
+            founded_year=dto.founded_year,
+            employee_count=dto.employee_count,
+            contact_email=dto.contact_email,
+            contact_phone=dto.contact_phone,
             domains=[
                 DomainResponse(
                     id=d.id,

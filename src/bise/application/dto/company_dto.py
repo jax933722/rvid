@@ -50,6 +50,13 @@ class CompanyDTO:
     status: str
     industry: str | None
     size_bucket: str | None
+    country: str | None
+    state: str | None
+    city: str | None
+    founded_year: int | None
+    employee_count: int | None
+    contact_email: str | None
+    contact_phone: str | None
     domains: tuple[DomainDTO, ...]
     created_at: datetime
     updated_at: datetime

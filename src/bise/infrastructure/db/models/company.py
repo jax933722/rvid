@@ -6,7 +6,7 @@ between the two so the domain never depends on SQLAlchemy.
 
 from __future__ import annotations
 
-from sqlalchemy import Boolean, ForeignKey, String, UniqueConstraint
+from sqlalchemy import Boolean, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from bise.infrastructure.db.base import Base, TimestampMixin
@@ -25,6 +25,13 @@ class CompanyModel(TimestampMixin, Base):
     )
     industry: Mapped[str | None] = mapped_column(String(128), index=True)
     size_bucket: Mapped[str | None] = mapped_column(String(32), index=True)
+    country: Mapped[str | None] = mapped_column(String(128), index=True)
+    state: Mapped[str | None] = mapped_column(String(128), index=True)
+    city: Mapped[str | None] = mapped_column(String(128), index=True)
+    founded_year: Mapped[int | None] = mapped_column(Integer, index=True)
+    employee_count: Mapped[int | None] = mapped_column(Integer, index=True)
+    contact_email: Mapped[str | None] = mapped_column(String(320))
+    contact_phone: Mapped[str | None] = mapped_column(String(64))
 
     domains: Mapped[list[DomainModel]] = relationship(
         back_populates="company",
