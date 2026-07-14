@@ -19,11 +19,13 @@ class AddCompanyTag:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def execute(self, company_id: int, label: str) -> CompanyTagDTO:
+    def execute(self, workspace_id: int, company_id: int, label: str) -> CompanyTagDTO:
         with self._uow as uow:
             if uow.companies.get(company_id) is None:
                 raise NotFoundError(f"Company not found: {company_id}")
-            saved = uow.company_tags.add(CompanyTag(company_id=company_id, label=label))
+            saved = uow.company_tags.add(
+                CompanyTag(workspace_id=workspace_id, company_id=company_id, label=label)
+            )
             uow.commit()
         logger.info("company_tag.added", company_id=company_id, label=saved.label)
         return company_tag_to_dto(saved)
@@ -35,9 +37,9 @@ class RemoveCompanyTag:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def execute(self, company_id: int, label: str) -> None:
+    def execute(self, workspace_id: int, company_id: int, label: str) -> None:
         with self._uow as uow:
-            uow.company_tags.remove(company_id, label)
+            uow.company_tags.remove(workspace_id, company_id, label)
             uow.commit()
         logger.info("company_tag.removed", company_id=company_id, label=label)
 
@@ -48,7 +50,7 @@ class ListCompanyTags:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def execute(self, company_id: int) -> list[CompanyTagDTO]:
+    def execute(self, workspace_id: int, company_id: int) -> list[CompanyTagDTO]:
         with self._uow as uow:
-            tags = uow.company_tags.list_for_company(company_id)
+            tags = uow.company_tags.list_for_company(workspace_id, company_id)
         return [company_tag_to_dto(t) for t in tags]

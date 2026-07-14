@@ -26,6 +26,7 @@ from bise.application.use_cases.workspace.tags import (
     RemoveCompanyTag,
 )
 from bise.presentation.api.dependencies import (
+    WorkspaceDep,
     get_add_company_tag,
     get_add_company_to_list,
     get_create_company_list,
@@ -62,9 +63,10 @@ router = APIRouter(tags=["workspace"])
 )
 async def save_search(
     body: SaveSearchRequest,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[SaveSearch, Depends(get_save_search)],
 ) -> SavedSearchResponse:
-    dto = use_case.execute(name=body.name, query_json=json.dumps(body.query))
+    dto = use_case.execute(workspace_id, name=body.name, query_json=json.dumps(body.query))
     return SavedSearchResponse.from_dto(dto)
 
 
@@ -74,9 +76,10 @@ async def save_search(
     summary="List saved searches",
 )
 async def list_saved_searches(
+    workspace_id: WorkspaceDep,
     use_case: Annotated[ListSavedSearches, Depends(get_list_saved_searches)],
 ) -> list[SavedSearchResponse]:
-    return [SavedSearchResponse.from_dto(s) for s in use_case.execute()]
+    return [SavedSearchResponse.from_dto(s) for s in use_case.execute(workspace_id)]
 
 
 @router.delete(
@@ -86,9 +89,10 @@ async def list_saved_searches(
 )
 async def delete_saved_search(
     search_id: int,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[DeleteSavedSearch, Depends(get_delete_saved_search)],
 ) -> None:
-    use_case.execute(search_id)
+    use_case.execute(workspace_id, search_id)
 
 
 # --- lists -----------------------------------------------------------------
@@ -100,16 +104,18 @@ async def delete_saved_search(
 )
 async def create_list(
     body: CreateListRequest,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[CreateCompanyList, Depends(get_create_company_list)],
 ) -> CompanyListResponse:
-    return CompanyListResponse.from_dto(use_case.execute(body.name, body.description))
+    return CompanyListResponse.from_dto(use_case.execute(workspace_id, body.name, body.description))
 
 
 @router.get("/lists", response_model=list[CompanyListResponse], summary="List company lists")
 async def list_lists(
+    workspace_id: WorkspaceDep,
     use_case: Annotated[ListCompanyLists, Depends(get_list_company_lists)],
 ) -> list[CompanyListResponse]:
-    return [CompanyListResponse.from_dto(cl) for cl in use_case.execute()]
+    return [CompanyListResponse.from_dto(cl) for cl in use_case.execute(workspace_id)]
 
 
 @router.delete(
@@ -119,9 +125,10 @@ async def list_lists(
 )
 async def delete_list(
     list_id: int,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[DeleteCompanyList, Depends(get_delete_company_list)],
 ) -> None:
-    use_case.execute(list_id)
+    use_case.execute(workspace_id, list_id)
 
 
 @router.get(
@@ -131,9 +138,10 @@ async def delete_list(
 )
 async def list_members(
     list_id: int,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[ListListMembers, Depends(get_list_list_members)],
 ) -> list[CompanyResponse]:
-    return [CompanyResponse.from_dto(c) for c in use_case.execute(list_id)]
+    return [CompanyResponse.from_dto(c) for c in use_case.execute(workspace_id, list_id)]
 
 
 @router.post(
@@ -144,9 +152,10 @@ async def list_members(
 async def add_to_list(
     list_id: int,
     body: AddToListRequest,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[AddCompanyToList, Depends(get_add_company_to_list)],
 ) -> CompanyListResponse:
-    return CompanyListResponse.from_dto(use_case.execute(list_id, body.company_id))
+    return CompanyListResponse.from_dto(use_case.execute(workspace_id, list_id, body.company_id))
 
 
 @router.delete(
@@ -157,9 +166,10 @@ async def add_to_list(
 async def remove_from_list(
     list_id: int,
     company_id: int,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[RemoveCompanyFromList, Depends(get_remove_company_from_list)],
 ) -> None:
-    use_case.execute(list_id, company_id)
+    use_case.execute(workspace_id, list_id, company_id)
 
 
 # --- tags ------------------------------------------------------------------
@@ -170,9 +180,10 @@ async def remove_from_list(
 )
 async def list_tags(
     company_id: int,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[ListCompanyTags, Depends(get_list_company_tags)],
 ) -> list[CompanyTagResponse]:
-    return [CompanyTagResponse.from_dto(t) for t in use_case.execute(company_id)]
+    return [CompanyTagResponse.from_dto(t) for t in use_case.execute(workspace_id, company_id)]
 
 
 @router.post(
@@ -184,9 +195,10 @@ async def list_tags(
 async def add_tag(
     company_id: int,
     body: AddTagRequest,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[AddCompanyTag, Depends(get_add_company_tag)],
 ) -> CompanyTagResponse:
-    return CompanyTagResponse.from_dto(use_case.execute(company_id, body.label))
+    return CompanyTagResponse.from_dto(use_case.execute(workspace_id, company_id, body.label))
 
 
 @router.delete(
@@ -197,6 +209,7 @@ async def add_tag(
 async def remove_tag(
     company_id: int,
     label: str,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[RemoveCompanyTag, Depends(get_remove_company_tag)],
 ) -> None:
-    use_case.execute(company_id, label)
+    use_case.execute(workspace_id, company_id, label)

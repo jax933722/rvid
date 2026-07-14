@@ -10,6 +10,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import Protocol
 
+from bise.domain.entities.api_key import ApiKey
 from bise.domain.entities.company import Company
 from bise.domain.entities.company_list import CompanyList
 from bise.domain.entities.company_tag import CompanyTag
@@ -21,6 +22,7 @@ from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
 from bise.domain.entities.website_domain import CrawlStatus
+from bise.domain.entities.workspace import Workspace
 from bise.shared.pagination import Page, PageRequest
 
 
@@ -133,42 +135,42 @@ class SeoProfileRepository(Protocol):
 
 
 class SavedSearchRepository(Protocol):
-    """Persistence for named Prospector searches."""
+    """Persistence for named Prospector searches (scoped to a workspace)."""
 
     def add(self, search: SavedSearch) -> SavedSearch:
-        """Persist a new saved search and return it with its assigned id."""
+        """Persist a new saved search (``search.workspace_id`` must be set)."""
         ...
 
-    def get(self, search_id: int) -> SavedSearch | None:
-        """Return the saved search with the given id, or ``None`` if absent."""
+    def get(self, workspace_id: int, search_id: int) -> SavedSearch | None:
+        """Return the workspace's saved search with the given id, or ``None``."""
         ...
 
-    def list(self) -> Sequence[SavedSearch]:
-        """Return all saved searches, newest first."""
+    def list(self, workspace_id: int) -> Sequence[SavedSearch]:
+        """Return the workspace's saved searches, newest first."""
         ...
 
-    def delete(self, search_id: int) -> bool:
-        """Delete a saved search; return ``True`` if a row was removed."""
+    def delete(self, workspace_id: int, search_id: int) -> bool:
+        """Delete a workspace's saved search; return ``True`` if a row was removed."""
         ...
 
 
 class CompanyListRepository(Protocol):
-    """Persistence for company lists (also used for bookmarking)."""
+    """Persistence for company lists (scoped to a workspace; also bookmarking)."""
 
     def add(self, company_list: CompanyList) -> CompanyList:
-        """Persist a new list and return it with its assigned id."""
+        """Persist a new list (``company_list.workspace_id`` must be set)."""
         ...
 
-    def get(self, list_id: int) -> CompanyList | None:
-        """Return the list with the given id (with ``member_count`` filled), or ``None``."""
+    def get(self, workspace_id: int, list_id: int) -> CompanyList | None:
+        """Return the workspace's list (with ``member_count`` filled), or ``None``."""
         ...
 
-    def list(self) -> Sequence[CompanyList]:
-        """Return all lists (with ``member_count`` filled), newest first."""
+    def list(self, workspace_id: int) -> Sequence[CompanyList]:
+        """Return the workspace's lists (with ``member_count`` filled), newest first."""
         ...
 
-    def delete(self, list_id: int) -> bool:
-        """Delete a list and its memberships; return ``True`` if a row was removed."""
+    def delete(self, workspace_id: int, list_id: int) -> bool:
+        """Delete a workspace's list and its memberships; ``True`` if removed."""
         ...
 
     def add_company(self, list_id: int, company_id: int) -> bool:
@@ -181,6 +183,50 @@ class CompanyListRepository(Protocol):
 
     def list_members(self, list_id: int) -> Sequence[Company]:
         """Return the companies in a list, newest membership first."""
+        ...
+
+
+class WorkspaceRepository(Protocol):
+    """Persistence for :class:`Workspace` (tenants)."""
+
+    def add(self, workspace: Workspace) -> Workspace:
+        """Persist a new workspace and return it with its assigned id."""
+        ...
+
+    def get(self, workspace_id: int) -> Workspace | None:
+        """Return the workspace with the given id, or ``None``."""
+        ...
+
+    def get_by_slug(self, slug: str) -> Workspace | None:
+        """Return the workspace with the given slug, or ``None``."""
+        ...
+
+    def list(self) -> Sequence[Workspace]:
+        """Return all workspaces, oldest first."""
+        ...
+
+
+class ApiKeyRepository(Protocol):
+    """Persistence + lookup for :class:`ApiKey` credentials."""
+
+    def add(self, api_key: ApiKey) -> ApiKey:
+        """Persist a new API key (already hashed) and return it with its id."""
+        ...
+
+    def get_active_by_hash(self, key_hash: str) -> ApiKey | None:
+        """Return the non-revoked key matching this hash, or ``None`` (auth lookup)."""
+        ...
+
+    def list_for_workspace(self, workspace_id: int) -> Sequence[ApiKey]:
+        """Return the workspace's keys, newest first."""
+        ...
+
+    def revoke(self, workspace_id: int, key_id: int) -> bool:
+        """Revoke a workspace's key; return ``True`` if a key was revoked."""
+        ...
+
+    def touch_last_used(self, key_id: int) -> None:
+        """Record that a key was just used to authenticate."""
         ...
 
 
@@ -219,16 +265,16 @@ class EnrichmentJobRepository(Protocol):
 
 
 class CompanyTagRepository(Protocol):
-    """Persistence for company tags (normalized labels)."""
+    """Persistence for company tags (normalized labels, scoped to a workspace)."""
 
     def add(self, tag: CompanyTag) -> CompanyTag:
-        """Add a tag to a company (idempotent); return the stored tag."""
+        """Add a tag (idempotent within the workspace); return the stored tag."""
         ...
 
-    def remove(self, company_id: int, label: str) -> bool:
-        """Remove a tag from a company; return ``True`` if a row was removed."""
+    def remove(self, workspace_id: int, company_id: int, label: str) -> bool:
+        """Remove a workspace's tag from a company; ``True`` if a row was removed."""
         ...
 
-    def list_for_company(self, company_id: int) -> Sequence[CompanyTag]:
-        """Return all tags on a company, ordered by label."""
+    def list_for_company(self, workspace_id: int, company_id: int) -> Sequence[CompanyTag]:
+        """Return the workspace's tags on a company, ordered by label."""
         ...

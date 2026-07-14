@@ -14,6 +14,9 @@ class SavedSearchModel(TimestampMixin, Base):
     __tablename__ = "saved_searches"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     query_json: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -24,6 +27,9 @@ class CompanyListModel(TimestampMixin, Base):
     __tablename__ = "company_lists"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(String(512))
 
@@ -58,10 +64,13 @@ class CompanyTagModel(TimestampMixin, Base):
 
     __tablename__ = "company_tags"
     __table_args__ = (
-        UniqueConstraint("company_id", "label", name="uq_company_label"),
+        UniqueConstraint("workspace_id", "company_id", "label", name="uq_ws_company_label"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     company_id: Mapped[int] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True
     )

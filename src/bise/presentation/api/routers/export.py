@@ -7,7 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query, Response
 
 from bise.application.dto.export_dto import ExportFormat, ExportResult
-from bise.presentation.api.dependencies import ContainerDep
+from bise.presentation.api.dependencies import ContainerDep, WorkspaceDep
 from bise.presentation.api.schemas.search import SearchRequest
 
 router = APIRouter(tags=["export"])
@@ -38,8 +38,9 @@ async def export_search(
 async def export_list(
     list_id: int,
     container: ContainerDep,
+    workspace_id: WorkspaceDep,
     fmt: FormatQuery = ExportFormat.CSV,
 ) -> Response:
     """Download all companies belonging to a list as a file."""
-    result = container.export_list_members(fmt).execute(list_id)
+    result = container.export_list_members(fmt).execute(workspace_id, list_id)
     return _as_response(result)

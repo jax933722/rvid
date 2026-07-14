@@ -19,8 +19,8 @@ class SaveSearch:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def execute(self, name: str, query_json: str) -> SavedSearchDTO:
-        search = SavedSearch(name=name, query_json=query_json)
+    def execute(self, workspace_id: int, name: str, query_json: str) -> SavedSearchDTO:
+        search = SavedSearch(workspace_id=workspace_id, name=name, query_json=query_json)
         with self._uow as uow:
             saved = uow.saved_searches.add(search)
             uow.commit()
@@ -34,9 +34,9 @@ class ListSavedSearches:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def execute(self) -> list[SavedSearchDTO]:
+    def execute(self, workspace_id: int) -> list[SavedSearchDTO]:
         with self._uow as uow:
-            searches = uow.saved_searches.list()
+            searches = uow.saved_searches.list(workspace_id)
         return [saved_search_to_dto(s) for s in searches]
 
 
@@ -46,9 +46,9 @@ class DeleteSavedSearch:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def execute(self, search_id: int) -> None:
+    def execute(self, workspace_id: int, search_id: int) -> None:
         with self._uow as uow:
-            removed = uow.saved_searches.delete(search_id)
+            removed = uow.saved_searches.delete(workspace_id, search_id)
             if not removed:
                 raise NotFoundError(f"Saved search not found: {search_id}")
             uow.commit()

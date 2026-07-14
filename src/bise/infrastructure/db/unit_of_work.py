@@ -7,6 +7,7 @@ from types import TracebackType
 from sqlalchemy.orm import Session, sessionmaker
 
 from bise.application.ports.repositories import (
+    ApiKeyRepository,
     CompanyListRepository,
     CompanyRepository,
     CompanyTagRepository,
@@ -18,6 +19,11 @@ from bise.application.ports.repositories import (
     SavedSearchRepository,
     SeoProfileRepository,
     TechnologyRepository,
+    WorkspaceRepository,
+)
+from bise.infrastructure.db.repositories.auth_repository import (
+    SqlAlchemyApiKeyRepository,
+    SqlAlchemyWorkspaceRepository,
 )
 from bise.infrastructure.db.repositories.company_repository import SqlAlchemyCompanyRepository
 from bise.infrastructure.db.repositories.crawl_repository import (
@@ -64,6 +70,8 @@ class SqlAlchemyUnitOfWork:
         self.company_lists: CompanyListRepository
         self.company_tags: CompanyTagRepository
         self.enrichment_jobs: EnrichmentJobRepository
+        self.workspaces: WorkspaceRepository
+        self.api_keys: ApiKeyRepository
 
     def __enter__(self) -> SqlAlchemyUnitOfWork:
         self._session = self._session_factory()
@@ -78,6 +86,8 @@ class SqlAlchemyUnitOfWork:
         self.company_lists = SqlAlchemyCompanyListRepository(self._session)
         self.company_tags = SqlAlchemyCompanyTagRepository(self._session)
         self.enrichment_jobs = SqlAlchemyEnrichmentJobRepository(self._session)
+        self.workspaces = SqlAlchemyWorkspaceRepository(self._session)
+        self.api_keys = SqlAlchemyApiKeyRepository(self._session)
         return self
 
     def __exit__(

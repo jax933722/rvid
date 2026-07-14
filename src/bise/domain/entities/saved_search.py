@@ -23,6 +23,7 @@ class SavedSearch:
 
     name: str
     query_json: str
+    workspace_id: int | None = None
     id: int | None = field(default=None)
     created_at: datetime = field(default_factory=_utcnow)
     updated_at: datetime = field(default_factory=_utcnow)

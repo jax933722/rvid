@@ -54,6 +54,13 @@ class Settings(BaseSettings):
     log_level: LogLevel = "INFO"
     log_json: bool = True
 
+    # --- Auth / multi-tenancy (opt-in) ---
+    # When False (default) every request runs in the default workspace with no
+    # credentials, so local/dev use needs no setup. A deployer sets this True to
+    # require a valid API key on protected endpoints.
+    auth_enabled: bool = False
+    default_workspace_slug: str = "default"
+
     @field_validator("database_url")
     @classmethod
     def _database_url_not_empty(cls, value: str) -> str:

@@ -5,6 +5,7 @@ Importing this package registers every model on ``Base.metadata`` so that
 import order.
 """
 
+from bise.infrastructure.db.models.auth import ApiKeyModel, WorkspaceModel
 from bise.infrastructure.db.models.company import CompanyModel, DomainModel
 from bise.infrastructure.db.models.crawl import CrawledPageModel, CrawlJobModel
 from bise.infrastructure.db.models.enrichment import EnrichmentJobModel
@@ -24,6 +25,7 @@ from bise.infrastructure.db.models.workspace import (
 )
 
 __all__ = [
+    "ApiKeyModel",
     "CompanyListItemModel",
     "CompanyListModel",
     "CompanyModel",
@@ -39,4 +41,5 @@ __all__ = [
     "SeoProfileModel",
     "TechnologyCategoryModel",
     "TechnologyModel",
+    "WorkspaceModel",
 ]

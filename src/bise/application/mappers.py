@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from bise.application.dto.auth_dto import ApiKeyDTO, WorkspaceDTO
 from bise.application.dto.company_dto import CompanyDTO, DomainDTO
 from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
 from bise.application.dto.enrichment_dto import EnrichmentJobDTO
@@ -9,6 +10,7 @@ from bise.application.dto.marketing_dto import MarketingSignalDTO
 from bise.application.dto.seo_dto import SeoProfileDTO
 from bise.application.dto.technology_dto import CompanyTechnologyDTO, TechnologyDTO
 from bise.application.dto.workspace_dto import CompanyListDTO, CompanyTagDTO, SavedSearchDTO
+from bise.domain.entities.api_key import ApiKey
 from bise.domain.entities.company import Company
 from bise.domain.entities.company_list import CompanyList
 from bise.domain.entities.company_tag import CompanyTag
@@ -19,6 +21,7 @@ from bise.domain.entities.marketing_signal import MarketingSignal
 from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
+from bise.domain.entities.workspace import Workspace
 
 
 def company_to_dto(company: Company) -> CompanyDTO:
@@ -189,4 +192,27 @@ def enrichment_job_to_dto(job: EnrichmentJob) -> EnrichmentJobDTO:
         started_at=job.started_at,
         finished_at=job.finished_at,
         created_at=job.created_at,
+    )
+
+
+def workspace_to_dto(workspace: Workspace) -> WorkspaceDTO:
+    """Convert a :class:`Workspace` entity into its boundary DTO."""
+    return WorkspaceDTO(
+        id=workspace.id,
+        name=workspace.name,
+        slug=workspace.slug,
+        created_at=workspace.created_at,
+    )
+
+
+def api_key_to_dto(api_key: ApiKey) -> ApiKeyDTO:
+    """Convert an :class:`ApiKey` entity into its boundary DTO (no secret)."""
+    return ApiKeyDTO(
+        id=api_key.id,
+        workspace_id=api_key.workspace_id,
+        name=api_key.name,
+        prefix=api_key.prefix,
+        revoked=api_key.revoked,
+        last_used_at=api_key.last_used_at,
+        created_at=api_key.created_at,
     )

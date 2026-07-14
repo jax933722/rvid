@@ -20,6 +20,12 @@ from bise.application.ports.page_speed import PageSpeedPort
 from bise.application.ports.search import SearchIndexPort
 from bise.application.ports.seo_analyzer import SeoAnalyzerPort
 from bise.application.ports.technology_detector import TechnologyDetectorPort
+from bise.application.use_cases.auth.api_keys import CreateApiKey, ListApiKeys, RevokeApiKey
+from bise.application.use_cases.auth.authenticate import AuthenticateApiKey
+from bise.application.use_cases.auth.workspaces import (
+    CreateWorkspace,
+    GetOrCreateDefaultWorkspace,
+)
 from bise.application.use_cases.companies.create_company import CreateCompany
 from bise.application.use_cases.companies.get_company import GetCompany
 from bise.application.use_cases.companies.list_companies import ListCompanies
@@ -88,6 +94,7 @@ class Container:
         self._search_index: SearchIndexPort | None = None
         self._marketing_detector: MarketingDetectorPort | None = None
         self._discovery_source: DiscoverySourcePort | None = None
+        self._default_workspace_id: int | None = None
 
     def unit_of_work(self) -> SqlAlchemyUnitOfWork:
         """Create a fresh Unit of Work (one transactional scope per use case call)."""
@@ -238,6 +245,35 @@ class Container:
 
     def export_list_members(self, fmt: ExportFormat) -> ExportListMembers:
         return ExportListMembers(self.unit_of_work(), self.exporter(fmt))
+
+    # --- Auth / workspaces / API keys ---
+    def create_workspace(self) -> CreateWorkspace:
+        return CreateWorkspace(self.unit_of_work())
+
+    def get_or_create_default_workspace(self) -> GetOrCreateDefaultWorkspace:
+        return GetOrCreateDefaultWorkspace(self.unit_of_work())
+
+    def create_api_key(self) -> CreateApiKey:
+        return CreateApiKey(self.unit_of_work())
+
+    def list_api_keys(self) -> ListApiKeys:
+        return ListApiKeys(self.unit_of_work())
+
+    def revoke_api_key(self) -> RevokeApiKey:
+        return RevokeApiKey(self.unit_of_work())
+
+    def authenticate_api_key(self) -> AuthenticateApiKey:
+        return AuthenticateApiKey(self.unit_of_work())
+
+    def default_workspace_id(self) -> int:
+        """The default workspace id, created on first use and memoized."""
+        if self._default_workspace_id is None:
+            dto = self.get_or_create_default_workspace().execute(
+                self.settings.default_workspace_slug
+            )
+            assert dto.id is not None
+            self._default_workspace_id = dto.id
+        return self._default_workspace_id
 
     # --- Enrichment queue ---
     def enqueue_enrichment(self) -> EnqueueEnrichment:

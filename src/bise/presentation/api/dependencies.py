@@ -9,8 +9,10 @@ from __future__ import annotations
 from typing import Annotated
 
 from config.containers import Container
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request, status
 
+from bise.application.use_cases.auth.api_keys import CreateApiKey, ListApiKeys, RevokeApiKey
+from bise.application.use_cases.auth.workspaces import CreateWorkspace
 from bise.application.use_cases.companies.create_company import CreateCompany
 from bise.application.use_cases.companies.get_company import GetCompany
 from bise.application.use_cases.companies.list_companies import ListCompanies
@@ -56,6 +58,36 @@ def get_container(request: Request) -> Container:
 
 
 ContainerDep = Annotated[Container, Depends(get_container)]
+
+
+def _extract_api_key(request: Request) -> str | None:
+    """Pull the API key from ``Authorization: Bearer`` or ``X-API-Key``."""
+    header = request.headers.get("authorization")
+    if header and header.lower().startswith("bearer "):
+        return header[7:].strip()
+    return request.headers.get("x-api-key")
+
+
+def require_workspace(request: Request, container: ContainerDep) -> int:
+    """Resolve the caller's workspace id.
+
+    When auth is disabled (the default) every request runs in the default
+    workspace. When enabled, a valid API key is required or the request is
+    rejected with 401.
+    """
+    if not container.settings.auth_enabled:
+        return container.default_workspace_id()
+    workspace = container.authenticate_api_key().execute(_extract_api_key(request) or "")
+    if workspace is None or workspace.id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing API key",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return workspace.id
+
+
+WorkspaceDep = Annotated[int, Depends(require_workspace)]
 
 
 def get_create_company(container: ContainerDep) -> CreateCompany:
@@ -176,3 +208,19 @@ def get_enqueue_enrichment(container: ContainerDep) -> EnqueueEnrichment:
 
 def get_queue_summary(container: ContainerDep) -> GetQueueSummary:
     return container.get_queue_summary()
+
+
+def get_create_workspace(container: ContainerDep) -> CreateWorkspace:
+    return container.create_workspace()
+
+
+def get_create_api_key(container: ContainerDep) -> CreateApiKey:
+    return container.create_api_key()
+
+
+def get_list_api_keys(container: ContainerDep) -> ListApiKeys:
+    return container.list_api_keys()
+
+
+def get_revoke_api_key(container: ContainerDep) -> RevokeApiKey:
+    return container.revoke_api_key()

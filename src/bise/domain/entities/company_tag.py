@@ -23,6 +23,7 @@ class CompanyTag:
 
     company_id: int
     label: str
+    workspace_id: int | None = None
     id: int | None = field(default=None)
     created_at: datetime = field(default_factory=_utcnow)
 

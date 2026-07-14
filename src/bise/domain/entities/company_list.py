@@ -24,6 +24,7 @@ class CompanyList:
     name: str
     description: str | None = None
     member_count: int = 0
+    workspace_id: int | None = None
     id: int | None = field(default=None)
     created_at: datetime = field(default_factory=_utcnow)
     updated_at: datetime = field(default_factory=_utcnow)

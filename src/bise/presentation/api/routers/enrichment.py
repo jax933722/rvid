@@ -10,6 +10,7 @@ from bise.application.use_cases.enrichment.enqueue_enrichment import EnqueueEnri
 from bise.application.use_cases.enrichment.get_queue_summary import GetQueueSummary
 from bise.presentation.api.dependencies import (
     ContainerDep,
+    WorkspaceDep,
     get_enqueue_enrichment,
     get_queue_summary,
 )
@@ -31,10 +32,11 @@ router = APIRouter(tags=["enrichment"])
 )
 async def enqueue(
     body: EnqueueRequest,
+    workspace_id: WorkspaceDep,
     use_case: Annotated[EnqueueEnrichment, Depends(get_enqueue_enrichment)],
 ) -> EnqueueResultResponse:
     """Create PENDING jobs; companies already queued or running are skipped."""
-    return EnqueueResultResponse.from_dto(use_case.execute(body.to_command()))
+    return EnqueueResultResponse.from_dto(use_case.execute(workspace_id, body.to_command()))
 
 
 @router.get(

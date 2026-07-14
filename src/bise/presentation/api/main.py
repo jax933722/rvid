@@ -15,6 +15,7 @@ from fastapi import FastAPI
 from bise import __version__
 from bise.presentation.api.errors import register_exception_handlers
 from bise.presentation.api.routers import (
+    auth,
     companies,
     crawlers,
     discovery,
@@ -42,9 +43,12 @@ def create_app(container: Container | None = None) -> FastAPI:
         description="Searchable index of publicly available business information.",
     )
     app.state.container = container or Container(settings)
+    # The default workspace is created lazily on first use (see
+    # Container.default_workspace_id), so building the app touches no database.
 
     register_exception_handlers(app)
     app.include_router(health.router, prefix=API_PREFIX)
+    app.include_router(auth.router, prefix=API_PREFIX)
     app.include_router(companies.router, prefix=API_PREFIX)
     app.include_router(crawlers.router, prefix=API_PREFIX)
     app.include_router(technologies.router, prefix=API_PREFIX)

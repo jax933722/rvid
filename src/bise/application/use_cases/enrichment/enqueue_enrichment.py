@@ -19,11 +19,11 @@ class EnqueueEnrichment:
     def __init__(self, uow: UnitOfWork) -> None:
         self._uow = uow
 
-    def execute(self, command: EnqueueEnrichmentCommand) -> EnqueueResultDTO:
+    def execute(self, workspace_id: int, command: EnqueueEnrichmentCommand) -> EnqueueResultDTO:
         with self._uow as uow:
             company_ids = list(command.company_ids)
             if command.list_id is not None:
-                if uow.company_lists.get(command.list_id) is None:
+                if uow.company_lists.get(workspace_id, command.list_id) is None:
                     raise NotFoundError(f"List not found: {command.list_id}")
                 members = uow.company_lists.list_members(command.list_id)
                 company_ids.extend(c.id for c in members if c.id is not None)

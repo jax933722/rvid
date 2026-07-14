@@ -21,9 +21,9 @@ class ExportListMembers:
         self._uow = uow
         self._exporter = exporter
 
-    def execute(self, list_id: int) -> ExportResult:
+    def execute(self, workspace_id: int, list_id: int) -> ExportResult:
         with self._uow as uow:
-            company_list = uow.company_lists.get(list_id)
+            company_list = uow.company_lists.get(workspace_id, list_id)
             if company_list is None:
                 raise NotFoundError(f"List not found: {list_id}")
             members = uow.company_lists.list_members(list_id)
