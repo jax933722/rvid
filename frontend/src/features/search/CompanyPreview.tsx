@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { api } from "@/api/client";
 import { Badge, Card, gradeTone, Spinner } from "@/components/ui";
+import { CompanyWorkspacePanel } from "@/features/workspace/CompanyWorkspacePanel";
 
 export function CompanyPreview({ companyId }: { companyId: number | null }) {
   const company = useQuery({
@@ -74,6 +75,8 @@ export function CompanyPreview({ companyId }: { companyId: number | null }) {
           </div>
         </Card>
       )}
+      <CompanyWorkspacePanel companyId={companyId} />
+
       <Link
         to={`/companies/${companyId}`}
         className="inline-block rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"

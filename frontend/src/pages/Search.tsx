@@ -8,9 +8,11 @@ import { ResultsTable } from "@/features/search/ResultsTable";
 import {
   activeFilterCount,
   EMPTY_STATE,
+  fromRequest,
   toRequest,
   type SearchFormState,
 } from "@/features/search/types";
+import { SavedSearchBar } from "@/features/workspace/SavedSearchBar";
 
 export function SearchPage() {
   const [state, setState] = useState<SearchFormState>(EMPTY_STATE);
@@ -54,7 +56,10 @@ export function SearchPage() {
               Filters apply live · OR within a field, AND across fields
             </p>
           </div>
-          {query.isFetching && <span className="text-xs text-slate-400">updating…</span>}
+          <div className="flex items-center gap-2">
+            {query.isFetching && <span className="text-xs text-slate-400">updating…</span>}
+            <SavedSearchBar request={request} onApply={(req) => setState(fromRequest(req))} />
+          </div>
         </div>
         {query.isLoading ? (
           <Spinner />

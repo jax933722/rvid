@@ -2,10 +2,13 @@
 
 import type {
   Company,
+  CompanyList,
+  CompanyTag,
   CompanyTechnology,
   CrawlJob,
   DiscoveredBusiness,
   Page,
+  SavedSearch,
   SearchRequest,
   SearchResult,
   SeoProfile,
@@ -81,4 +84,52 @@ export const api = {
 
   enrichCompany: (id: number) =>
     request<{ status: string; company_id: number }>(`/companies/${id}/enrich`, { method: "POST" }),
+
+  // --- workspace: saved searches ---
+  listSavedSearches: () => request<SavedSearch[]>("/saved-searches"),
+
+  saveSearch: (name: string, query: SearchRequest) =>
+    request<SavedSearch>("/saved-searches", {
+      method: "POST",
+      body: JSON.stringify({ name, query }),
+    }),
+
+  deleteSavedSearch: (id: number) =>
+    request<void>(`/saved-searches/${id}`, { method: "DELETE" }),
+
+  // --- workspace: lists ---
+  listLists: () => request<CompanyList[]>("/lists"),
+
+  createList: (name: string, description?: string | null) =>
+    request<CompanyList>("/lists", {
+      method: "POST",
+      body: JSON.stringify({ name, description: description ?? null }),
+    }),
+
+  deleteList: (id: number) => request<void>(`/lists/${id}`, { method: "DELETE" }),
+
+  listMembers: (id: number) => request<Company[]>(`/lists/${id}/companies`),
+
+  addToList: (listId: number, companyId: number) =>
+    request<CompanyList>(`/lists/${listId}/companies`, {
+      method: "POST",
+      body: JSON.stringify({ company_id: companyId }),
+    }),
+
+  removeFromList: (listId: number, companyId: number) =>
+    request<void>(`/lists/${listId}/companies/${companyId}`, { method: "DELETE" }),
+
+  // --- workspace: tags ---
+  listTags: (companyId: number) => request<CompanyTag[]>(`/companies/${companyId}/tags`),
+
+  addTag: (companyId: number, label: string) =>
+    request<CompanyTag>(`/companies/${companyId}/tags`, {
+      method: "POST",
+      body: JSON.stringify({ label }),
+    }),
+
+  removeTag: (companyId: number, label: string) =>
+    request<void>(`/companies/${companyId}/tags/${encodeURIComponent(label)}`, {
+      method: "DELETE",
+    }),
 };

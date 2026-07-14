@@ -4,6 +4,7 @@ import { CompanyDetailsPage } from "@/pages/CompanyDetails";
 import { CrawlerMonitorPage } from "@/pages/CrawlerMonitor";
 import { DashboardPage } from "@/pages/Dashboard";
 import { DiscoverPage } from "@/pages/Discover";
+import { ListsPage } from "@/pages/Lists";
 import { SearchPage } from "@/pages/Search";
 import { SettingsPage } from "@/pages/Settings";
 
@@ -14,6 +15,7 @@ export function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/lists" element={<ListsPage />} />
         <Route path="/companies/:id" element={<CompanyDetailsPage />} />
         <Route path="/crawlers" element={<CrawlerMonitorPage />} />
         <Route path="/settings" element={<SettingsPage />} />

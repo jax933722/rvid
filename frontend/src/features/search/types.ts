@@ -77,6 +77,61 @@ export function activeFilterCount(state: SearchFormState): number {
   return n;
 }
 
+/** Reconstruct form state from a stored SearchRequest (inverse of toRequest). */
+export function fromRequest(req: SearchRequest): SearchFormState {
+  const state: SearchFormState = {
+    ...EMPTY_STATE,
+    founded: { ...EMPTY_RANGE },
+    employees: { ...EMPTY_RANGE },
+    seo: { ...EMPTY_RANGE },
+    flags: { ...EMPTY_STATE.flags },
+    text: req.text ?? "",
+  };
+  const range = (values: string[], op: string): RangeState => {
+    if (op === "between") return { min: values[0] ?? "", max: values[1] ?? "" };
+    if (op === "gte") return { min: values[0] ?? "", max: "" };
+    return { min: "", max: values[0] ?? "" };
+  };
+  for (const f of req.filters) {
+    switch (f.field) {
+      case "industry":
+        state.industries = f.values;
+        break;
+      case "country":
+        state.country = f.values[0] ?? "";
+        break;
+      case "state":
+        state.state = f.values[0] ?? "";
+        break;
+      case "city":
+        state.city = f.values[0] ?? "";
+        break;
+      case "technology":
+        state.technologies = f.values;
+        break;
+      case "founded_year":
+        state.founded = range(f.values, f.op);
+        break;
+      case "employee_count":
+        state.employees = range(f.values, f.op);
+        break;
+      case "seo_grade":
+        state.seoGrades = f.values;
+        break;
+      case "seo_score":
+        state.seo = range(f.values, f.op);
+        break;
+      case "has_contact_page":
+      case "has_careers_page":
+      case "has_blog":
+      case "has_ssl":
+        state.flags[f.field] = true;
+        break;
+    }
+  }
+  return state;
+}
+
 export function toRequest(state: SearchFormState): SearchRequest {
   const filters: SearchFilter[] = [];
 

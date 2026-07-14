@@ -131,6 +131,30 @@ export interface SearchResult {
   page_size: number;
 }
 
+export interface SavedSearch {
+  id: number;
+  name: string;
+  query: SearchRequest;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CompanyList {
+  id: number;
+  name: string;
+  description: string | null;
+  member_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CompanyTag {
+  id: number;
+  company_id: number;
+  label: string;
+  created_at: string;
+}
+
 export interface DiscoveredBusiness {
   name: string;
   category: string;
