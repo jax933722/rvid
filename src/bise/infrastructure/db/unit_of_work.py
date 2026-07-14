@@ -7,11 +7,14 @@ from types import TracebackType
 from sqlalchemy.orm import Session, sessionmaker
 
 from bise.application.ports.repositories import (
+    CompanyListRepository,
     CompanyRepository,
+    CompanyTagRepository,
     CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
     MarketingSignalRepository,
+    SavedSearchRepository,
     SeoProfileRepository,
     TechnologyRepository,
 )
@@ -27,6 +30,11 @@ from bise.infrastructure.db.repositories.seo_repository import SqlAlchemySeoProf
 from bise.infrastructure.db.repositories.technology_repository import (
     SqlAlchemyCompanyTechnologyRepository,
     SqlAlchemyTechnologyRepository,
+)
+from bise.infrastructure.db.repositories.workspace_repository import (
+    SqlAlchemyCompanyListRepository,
+    SqlAlchemyCompanyTagRepository,
+    SqlAlchemySavedSearchRepository,
 )
 
 
@@ -48,6 +56,9 @@ class SqlAlchemyUnitOfWork:
         self.company_technologies: CompanyTechnologyRepository
         self.seo_profiles: SeoProfileRepository
         self.marketing_signals: MarketingSignalRepository
+        self.saved_searches: SavedSearchRepository
+        self.company_lists: CompanyListRepository
+        self.company_tags: CompanyTagRepository
 
     def __enter__(self) -> SqlAlchemyUnitOfWork:
         self._session = self._session_factory()
@@ -58,6 +69,9 @@ class SqlAlchemyUnitOfWork:
         self.company_technologies = SqlAlchemyCompanyTechnologyRepository(self._session)
         self.seo_profiles = SqlAlchemySeoProfileRepository(self._session)
         self.marketing_signals = SqlAlchemyMarketingSignalRepository(self._session)
+        self.saved_searches = SqlAlchemySavedSearchRepository(self._session)
+        self.company_lists = SqlAlchemyCompanyListRepository(self._session)
+        self.company_tags = SqlAlchemyCompanyTagRepository(self._session)
         return self
 
     def __exit__(

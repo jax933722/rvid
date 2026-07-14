@@ -7,12 +7,16 @@ makes persistence swappable and use cases unit-testable with in-memory fakes.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Protocol
 
 from bise.domain.entities.company import Company
+from bise.domain.entities.company_list import CompanyList
+from bise.domain.entities.company_tag import CompanyTag
 from bise.domain.entities.crawl_job import CrawlJob, CrawlJobStatus
 from bise.domain.entities.crawled_page import CrawledPage
 from bise.domain.entities.marketing_signal import MarketingSignal
+from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
 from bise.domain.entities.website_domain import CrawlStatus
@@ -124,4 +128,72 @@ class SeoProfileRepository(Protocol):
 
     def get_for_company(self, company_id: int) -> SeoProfile | None:
         """Return the company's current SEO profile, if scanned."""
+        ...
+
+
+class SavedSearchRepository(Protocol):
+    """Persistence for named Prospector searches."""
+
+    def add(self, search: SavedSearch) -> SavedSearch:
+        """Persist a new saved search and return it with its assigned id."""
+        ...
+
+    def get(self, search_id: int) -> SavedSearch | None:
+        """Return the saved search with the given id, or ``None`` if absent."""
+        ...
+
+    def list(self) -> Sequence[SavedSearch]:
+        """Return all saved searches, newest first."""
+        ...
+
+    def delete(self, search_id: int) -> bool:
+        """Delete a saved search; return ``True`` if a row was removed."""
+        ...
+
+
+class CompanyListRepository(Protocol):
+    """Persistence for company lists (also used for bookmarking)."""
+
+    def add(self, company_list: CompanyList) -> CompanyList:
+        """Persist a new list and return it with its assigned id."""
+        ...
+
+    def get(self, list_id: int) -> CompanyList | None:
+        """Return the list with the given id (with ``member_count`` filled), or ``None``."""
+        ...
+
+    def list(self) -> Sequence[CompanyList]:
+        """Return all lists (with ``member_count`` filled), newest first."""
+        ...
+
+    def delete(self, list_id: int) -> bool:
+        """Delete a list and its memberships; return ``True`` if a row was removed."""
+        ...
+
+    def add_company(self, list_id: int, company_id: int) -> bool:
+        """Add a company to a list; ``True`` if newly added, ``False`` if already present."""
+        ...
+
+    def remove_company(self, list_id: int, company_id: int) -> bool:
+        """Remove a company from a list; return ``True`` if a membership was removed."""
+        ...
+
+    def list_members(self, list_id: int) -> Sequence[Company]:
+        """Return the companies in a list, newest membership first."""
+        ...
+
+
+class CompanyTagRepository(Protocol):
+    """Persistence for company tags (normalized labels)."""
+
+    def add(self, tag: CompanyTag) -> CompanyTag:
+        """Add a tag to a company (idempotent); return the stored tag."""
+        ...
+
+    def remove(self, company_id: int, label: str) -> bool:
+        """Remove a tag from a company; return ``True`` if a row was removed."""
+        ...
+
+    def list_for_company(self, company_id: int) -> Sequence[CompanyTag]:
+        """Return all tags on a company, ordered by label."""
         ...

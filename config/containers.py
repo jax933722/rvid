@@ -34,6 +34,24 @@ from bise.application.use_cases.enrichment.list_technologies import ListTechnolo
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
 from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
 from bise.application.use_cases.search.search_companies import SearchCompanies
+from bise.application.use_cases.workspace.lists import (
+    AddCompanyToList,
+    CreateCompanyList,
+    DeleteCompanyList,
+    ListCompanyLists,
+    ListListMembers,
+    RemoveCompanyFromList,
+)
+from bise.application.use_cases.workspace.saved_searches import (
+    DeleteSavedSearch,
+    ListSavedSearches,
+    SaveSearch,
+)
+from bise.application.use_cases.workspace.tags import (
+    AddCompanyTag,
+    ListCompanyTags,
+    RemoveCompanyTag,
+)
 from bise.crawlers.website_crawler import WebsiteCrawler
 from bise.infrastructure.analyzers.marketing_fingerprint import RuleBasedMarketingDetector
 from bise.infrastructure.analyzers.seo_analyzer import BeautifulSoupSeoAnalyzer
@@ -166,3 +184,40 @@ class Container:
             fetcher=self.page_fetcher(),
             parser=self.html_parser(),
         )
+
+    # --- Workspace: saved searches, lists, tags ---
+    def save_search(self) -> SaveSearch:
+        return SaveSearch(self.unit_of_work())
+
+    def list_saved_searches(self) -> ListSavedSearches:
+        return ListSavedSearches(self.unit_of_work())
+
+    def delete_saved_search(self) -> DeleteSavedSearch:
+        return DeleteSavedSearch(self.unit_of_work())
+
+    def create_company_list(self) -> CreateCompanyList:
+        return CreateCompanyList(self.unit_of_work())
+
+    def list_company_lists(self) -> ListCompanyLists:
+        return ListCompanyLists(self.unit_of_work())
+
+    def delete_company_list(self) -> DeleteCompanyList:
+        return DeleteCompanyList(self.unit_of_work())
+
+    def add_company_to_list(self) -> AddCompanyToList:
+        return AddCompanyToList(self.unit_of_work())
+
+    def remove_company_from_list(self) -> RemoveCompanyFromList:
+        return RemoveCompanyFromList(self.unit_of_work())
+
+    def list_list_members(self) -> ListListMembers:
+        return ListListMembers(self.unit_of_work())
+
+    def add_company_tag(self) -> AddCompanyTag:
+        return AddCompanyTag(self.unit_of_work())
+
+    def remove_company_tag(self) -> RemoveCompanyTag:
+        return RemoveCompanyTag(self.unit_of_work())
+
+    def list_company_tags(self) -> ListCompanyTags:
+        return ListCompanyTags(self.unit_of_work())

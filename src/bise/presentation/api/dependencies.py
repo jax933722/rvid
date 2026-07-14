@@ -27,6 +27,24 @@ from bise.application.use_cases.enrichment.list_technologies import ListTechnolo
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
 from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
 from bise.application.use_cases.search.search_companies import SearchCompanies
+from bise.application.use_cases.workspace.lists import (
+    AddCompanyToList,
+    CreateCompanyList,
+    DeleteCompanyList,
+    ListCompanyLists,
+    ListListMembers,
+    RemoveCompanyFromList,
+)
+from bise.application.use_cases.workspace.saved_searches import (
+    DeleteSavedSearch,
+    ListSavedSearches,
+    SaveSearch,
+)
+from bise.application.use_cases.workspace.tags import (
+    AddCompanyTag,
+    ListCompanyTags,
+    RemoveCompanyTag,
+)
 
 
 def get_container(request: Request) -> Container:
@@ -100,3 +118,51 @@ def get_search_companies(container: ContainerDep) -> SearchCompanies:
 
 def get_rebuild_search_document(container: ContainerDep) -> RebuildSearchDocument:
     return container.rebuild_search_document()
+
+
+def get_save_search(container: ContainerDep) -> SaveSearch:
+    return container.save_search()
+
+
+def get_list_saved_searches(container: ContainerDep) -> ListSavedSearches:
+    return container.list_saved_searches()
+
+
+def get_delete_saved_search(container: ContainerDep) -> DeleteSavedSearch:
+    return container.delete_saved_search()
+
+
+def get_create_company_list(container: ContainerDep) -> CreateCompanyList:
+    return container.create_company_list()
+
+
+def get_list_company_lists(container: ContainerDep) -> ListCompanyLists:
+    return container.list_company_lists()
+
+
+def get_delete_company_list(container: ContainerDep) -> DeleteCompanyList:
+    return container.delete_company_list()
+
+
+def get_add_company_to_list(container: ContainerDep) -> AddCompanyToList:
+    return container.add_company_to_list()
+
+
+def get_remove_company_from_list(container: ContainerDep) -> RemoveCompanyFromList:
+    return container.remove_company_from_list()
+
+
+def get_list_list_members(container: ContainerDep) -> ListListMembers:
+    return container.list_list_members()
+
+
+def get_add_company_tag(container: ContainerDep) -> AddCompanyTag:
+    return container.add_company_tag()
+
+
+def get_remove_company_tag(container: ContainerDep) -> RemoveCompanyTag:
+    return container.remove_company_tag()
+
+
+def get_list_company_tags(container: ContainerDep) -> ListCompanyTags:
+    return container.list_company_tags()

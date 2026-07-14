@@ -15,14 +15,24 @@ from bise.infrastructure.db.models.technology import (
     TechnologyCategoryModel,
     TechnologyModel,
 )
+from bise.infrastructure.db.models.workspace import (
+    CompanyListItemModel,
+    CompanyListModel,
+    CompanyTagModel,
+    SavedSearchModel,
+)
 
 __all__ = [
+    "CompanyListItemModel",
+    "CompanyListModel",
     "CompanyModel",
+    "CompanyTagModel",
     "CompanyTechnologyModel",
     "CrawlJobModel",
     "CrawledPageModel",
     "DomainModel",
     "MarketingSignalModel",
+    "SavedSearchModel",
     "SearchDocumentModel",
     "SeoProfileModel",
     "TechnologyCategoryModel",

@@ -7,10 +7,14 @@ from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
 from bise.application.dto.marketing_dto import MarketingSignalDTO
 from bise.application.dto.seo_dto import SeoProfileDTO
 from bise.application.dto.technology_dto import CompanyTechnologyDTO, TechnologyDTO
+from bise.application.dto.workspace_dto import CompanyListDTO, CompanyTagDTO, SavedSearchDTO
 from bise.domain.entities.company import Company
+from bise.domain.entities.company_list import CompanyList
+from bise.domain.entities.company_tag import CompanyTag
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage
 from bise.domain.entities.marketing_signal import MarketingSignal
+from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
 
@@ -136,4 +140,37 @@ def company_technology_to_dto(link: CompanyTechnology) -> CompanyTechnologyDTO:
         evidence=link.evidence,
         version=link.version,
         detected_at=link.detected_at,
+    )
+
+
+def saved_search_to_dto(search: SavedSearch) -> SavedSearchDTO:
+    """Convert a :class:`SavedSearch` entity into its boundary DTO."""
+    return SavedSearchDTO(
+        id=search.id,
+        name=search.name,
+        query_json=search.query_json,
+        created_at=search.created_at,
+        updated_at=search.updated_at,
+    )
+
+
+def company_list_to_dto(company_list: CompanyList) -> CompanyListDTO:
+    """Convert a :class:`CompanyList` entity into its boundary DTO."""
+    return CompanyListDTO(
+        id=company_list.id,
+        name=company_list.name,
+        description=company_list.description,
+        member_count=company_list.member_count,
+        created_at=company_list.created_at,
+        updated_at=company_list.updated_at,
+    )
+
+
+def company_tag_to_dto(tag: CompanyTag) -> CompanyTagDTO:
+    """Convert a :class:`CompanyTag` entity into its boundary DTO."""
+    return CompanyTagDTO(
+        id=tag.id,
+        company_id=tag.company_id,
+        label=tag.label,
+        created_at=tag.created_at,
     )
