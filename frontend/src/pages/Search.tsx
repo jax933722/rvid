@@ -12,6 +12,7 @@ import {
   toRequest,
   type SearchFormState,
 } from "@/features/search/types";
+import { ExportMenu } from "@/features/workspace/ExportMenu";
 import { SavedSearchBar } from "@/features/workspace/SavedSearchBar";
 
 export function SearchPage() {
@@ -58,6 +59,10 @@ export function SearchPage() {
           </div>
           <div className="flex items-center gap-2">
             {query.isFetching && <span className="text-xs text-slate-400">updating…</span>}
+            <ExportMenu
+              onExport={(format) => api.exportSearch(request, format)}
+              disabled={!result || result.total === 0}
+            />
             <SavedSearchBar request={request} onApply={(req) => setState(fromRequest(req))} />
           </div>
         </div>

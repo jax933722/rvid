@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { api } from "@/api/client";
 import type { CompanyList } from "@/api/types";
 import { Button, Card, Spinner } from "@/components/ui";
+import { ExportMenu } from "@/features/workspace/ExportMenu";
 
 export function ListsPage() {
   const qc = useQueryClient();
@@ -112,6 +113,10 @@ function ListCard({
           </div>
         </button>
         <div className="flex items-center gap-2">
+          <ExportMenu
+            onExport={(format) => api.exportListMembers(list.id, format)}
+            disabled={list.member_count === 0}
+          />
           <Button variant="ghost" onClick={onToggle}>
             {open ? "Hide" : "View"}
           </Button>

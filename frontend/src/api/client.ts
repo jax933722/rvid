@@ -46,6 +46,28 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
+export type ExportFormat = "csv" | "json" | "xlsx";
+
+/** Fetch a binary payload and trigger a browser download using its filename. */
+async function download(path: string, init?: RequestInit): Promise<void> {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...init,
+  });
+  if (!res.ok) throw new ApiError(res.status, res.statusText);
+  const blob = await res.blob();
+  const disposition = res.headers.get("Content-Disposition") ?? "";
+  const filename = /filename="?([^"]+)"?/.exec(disposition)?.[1] ?? "export";
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 export const api = {
   health: () => request<{ status: string }>("/health"),
 
@@ -132,4 +154,14 @@ export const api = {
     request<void>(`/companies/${companyId}/tags/${encodeURIComponent(label)}`, {
       method: "DELETE",
     }),
+
+  // --- export (triggers a file download) ---
+  exportSearch: (body: SearchRequest, format: ExportFormat) =>
+    download(`/export/search?format=${format}`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  exportListMembers: (listId: number, format: ExportFormat) =>
+    download(`/export/lists/${listId}?format=${format}`),
 };
