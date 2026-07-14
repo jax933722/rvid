@@ -155,6 +155,28 @@ export interface CompanyTag {
   created_at: string;
 }
 
+export interface EnrichmentJob {
+  id: number | null;
+  company_id: number;
+  status: string;
+  attempts: number;
+  error: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  created_at: string;
+}
+
+export interface EnqueueResult {
+  enqueued: number;
+  skipped: number;
+  jobs: EnrichmentJob[];
+}
+
+export interface QueueSummary {
+  counts: Record<string, number>;
+  recent: EnrichmentJob[];
+}
+
 export interface DiscoveredBusiness {
   name: string;
   category: string;

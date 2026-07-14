@@ -7,7 +7,9 @@ import type {
   CompanyTechnology,
   CrawlJob,
   DiscoveredBusiness,
+  EnqueueResult,
   Page,
+  QueueSummary,
   SavedSearch,
   SearchRequest,
   SearchResult,
@@ -164,4 +166,16 @@ export const api = {
 
   exportListMembers: (listId: number, format: ExportFormat) =>
     download(`/export/lists/${listId}?format=${format}`),
+
+  // --- enrichment queue ---
+  enqueueEnrichment: (body: { company_ids?: number[]; list_id?: number }) =>
+    request<EnqueueResult>("/enrichment/jobs", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  enrichmentQueue: () => request<QueueSummary>("/enrichment/queue"),
+
+  runEnrichment: (maxJobs = 10) =>
+    request<{ processed: number }>(`/enrichment/run?max_jobs=${maxJobs}`, { method: "POST" }),
 };

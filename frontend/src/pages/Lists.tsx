@@ -102,6 +102,10 @@ function ListCard({
       qc.invalidateQueries({ queryKey: ["lists"] });
     },
   });
+  const enqueue = useMutation({
+    mutationFn: () => api.enqueueEnrichment({ list_id: list.id }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["enrichment-queue"] }),
+  });
 
   return (
     <Card>
@@ -113,6 +117,16 @@ function ListCard({
           </div>
         </button>
         <div className="flex items-center gap-2">
+          {enqueue.isSuccess && (
+            <span className="text-xs text-green-600">queued {enqueue.data.enqueued}</span>
+          )}
+          <Button
+            variant="ghost"
+            onClick={() => enqueue.mutate()}
+            disabled={enqueue.isPending || list.member_count === 0}
+          >
+            {enqueue.isPending ? "Queuing…" : "Enrich list"}
+          </Button>
           <ExportMenu
             onExport={(format) => api.exportListMembers(list.id, format)}
             disabled={list.member_count === 0}

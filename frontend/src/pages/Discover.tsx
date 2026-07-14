@@ -67,9 +67,16 @@ export function DiscoverPage() {
       )}
       {discover.isSuccess && (
         <Card>
-          <div className="mb-2 text-sm text-slate-500">
-            Found {discover.data.length} businesses ·{" "}
-            {discover.data.filter((b) => b.company_id != null).length} have websites (saved)
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="text-sm text-slate-500">
+              Found {discover.data.length} businesses ·{" "}
+              {discover.data.filter((b) => b.company_id != null).length} have websites (saved)
+            </div>
+            <EnqueueAllButton
+              companyIds={discover.data
+                .map((b) => b.company_id)
+                .filter((id): id is number => id != null)}
+            />
           </div>
           {discover.data.length === 0 ? (
             <p className="p-6 text-center text-sm text-slate-400">
@@ -84,6 +91,25 @@ export function DiscoverPage() {
           )}
         </Card>
       )}
+    </div>
+  );
+}
+
+function EnqueueAllButton({ companyIds }: { companyIds: number[] }) {
+  const enqueue = useMutation({
+    mutationFn: () => api.enqueueEnrichment({ company_ids: companyIds }),
+  });
+  if (companyIds.length === 0) return null;
+  return (
+    <div className="flex items-center gap-2">
+      {enqueue.isSuccess && (
+        <span className="text-xs text-green-600">
+          Queued {enqueue.data.enqueued} · skipped {enqueue.data.skipped}
+        </span>
+      )}
+      <Button variant="ghost" onClick={() => enqueue.mutate()} disabled={enqueue.isPending}>
+        {enqueue.isPending ? "Queuing…" : `Enrich all (${companyIds.length})`}
+      </Button>
     </div>
   );
 }
