@@ -16,6 +16,7 @@ from bise.application.ports.repositories import (
     CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
+    EnrichmentJobRepository,
     MarketingSignalRepository,
     SavedSearchRepository,
     SeoProfileRepository,
@@ -36,6 +37,7 @@ class UnitOfWork(Protocol):
     saved_searches: SavedSearchRepository
     company_lists: CompanyListRepository
     company_tags: CompanyTagRepository
+    enrichment_jobs: EnrichmentJobRepository
 
     def __enter__(self) -> UnitOfWork: ...
 

@@ -20,7 +20,9 @@ from bise.application.use_cases.crawling.request_crawl import RequestCrawl
 from bise.application.use_cases.discovery.discover_businesses import DiscoverBusinesses
 from bise.application.use_cases.enrichment.detect_marketing import DetectMarketing
 from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
+from bise.application.use_cases.enrichment.enqueue_enrichment import EnqueueEnrichment
 from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
+from bise.application.use_cases.enrichment.get_queue_summary import GetQueueSummary
 from bise.application.use_cases.enrichment.list_company_marketing import ListCompanyMarketing
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
@@ -166,3 +168,11 @@ def get_remove_company_tag(container: ContainerDep) -> RemoveCompanyTag:
 
 def get_list_company_tags(container: ContainerDep) -> ListCompanyTags:
     return container.list_company_tags()
+
+
+def get_enqueue_enrichment(container: ContainerDep) -> EnqueueEnrichment:
+    return container.enqueue_enrichment()
+
+
+def get_queue_summary(container: ContainerDep) -> GetQueueSummary:
+    return container.get_queue_summary()

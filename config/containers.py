@@ -29,7 +29,9 @@ from bise.application.use_cases.crawling.request_crawl import RequestCrawl
 from bise.application.use_cases.discovery.discover_businesses import DiscoverBusinesses
 from bise.application.use_cases.enrichment.detect_marketing import DetectMarketing
 from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
+from bise.application.use_cases.enrichment.enqueue_enrichment import EnqueueEnrichment
 from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
+from bise.application.use_cases.enrichment.get_queue_summary import GetQueueSummary
 from bise.application.use_cases.enrichment.list_company_marketing import ListCompanyMarketing
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
@@ -236,3 +238,10 @@ class Container:
 
     def export_list_members(self, fmt: ExportFormat) -> ExportListMembers:
         return ExportListMembers(self.unit_of_work(), self.exporter(fmt))
+
+    # --- Enrichment queue ---
+    def enqueue_enrichment(self) -> EnqueueEnrichment:
+        return EnqueueEnrichment(self.unit_of_work())
+
+    def get_queue_summary(self) -> GetQueueSummary:
+        return GetQueueSummary(self.unit_of_work())

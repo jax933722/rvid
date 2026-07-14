@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from bise.application.dto.company_dto import CompanyDTO, DomainDTO
 from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
+from bise.application.dto.enrichment_dto import EnrichmentJobDTO
 from bise.application.dto.marketing_dto import MarketingSignalDTO
 from bise.application.dto.seo_dto import SeoProfileDTO
 from bise.application.dto.technology_dto import CompanyTechnologyDTO, TechnologyDTO
@@ -13,6 +14,7 @@ from bise.domain.entities.company_list import CompanyList
 from bise.domain.entities.company_tag import CompanyTag
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.enrichment_job import EnrichmentJob
 from bise.domain.entities.marketing_signal import MarketingSignal
 from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
@@ -173,4 +175,18 @@ def company_tag_to_dto(tag: CompanyTag) -> CompanyTagDTO:
         company_id=tag.company_id,
         label=tag.label,
         created_at=tag.created_at,
+    )
+
+
+def enrichment_job_to_dto(job: EnrichmentJob) -> EnrichmentJobDTO:
+    """Convert an :class:`EnrichmentJob` entity into its boundary DTO."""
+    return EnrichmentJobDTO(
+        id=job.id,
+        company_id=job.company_id,
+        status=job.status.value,
+        attempts=job.attempts,
+        error=job.error,
+        started_at=job.started_at,
+        finished_at=job.finished_at,
+        created_at=job.created_at,
     )

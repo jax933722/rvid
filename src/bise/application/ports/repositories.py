@@ -15,6 +15,7 @@ from bise.domain.entities.company_list import CompanyList
 from bise.domain.entities.company_tag import CompanyTag
 from bise.domain.entities.crawl_job import CrawlJob, CrawlJobStatus
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.enrichment_job import EnrichmentJob, EnrichmentJobStatus
 from bise.domain.entities.marketing_signal import MarketingSignal
 from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
@@ -180,6 +181,40 @@ class CompanyListRepository(Protocol):
 
     def list_members(self, list_id: int) -> Sequence[Company]:
         """Return the companies in a list, newest membership first."""
+        ...
+
+
+class EnrichmentJobRepository(Protocol):
+    """Persistence + queue operations for :class:`EnrichmentJob`."""
+
+    def add(self, job: EnrichmentJob) -> EnrichmentJob:
+        """Persist a new enrichment job and return it with its assigned id."""
+        ...
+
+    def get(self, job_id: int) -> EnrichmentJob | None:
+        """Return the job with the given id, or ``None`` if absent."""
+        ...
+
+    def update(self, job: EnrichmentJob) -> None:
+        """Persist state changes to an existing job."""
+        ...
+
+    def next_pending(self) -> EnrichmentJob | None:
+        """Return the oldest PENDING job, or ``None`` if the queue is empty."""
+        ...
+
+    def has_active_for_company(self, company_id: int) -> bool:
+        """Whether the company already has a PENDING or RUNNING job (dedupe guard)."""
+        ...
+
+    def list(
+        self, page: PageRequest, status: EnrichmentJobStatus | None = None
+    ) -> Page[EnrichmentJob]:
+        """Return a page of jobs, newest first, optionally filtered by status."""
+        ...
+
+    def counts_by_status(self) -> dict[str, int]:
+        """Return a mapping of status -> job count across the whole queue."""
         ...
 
 
