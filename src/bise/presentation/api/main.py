@@ -18,6 +18,7 @@ from bise.presentation.api.routers import (
     companies,
     crawlers,
     discovery,
+    export,
     health,
     marketing,
     search,
@@ -51,6 +52,7 @@ def create_app(container: Container | None = None) -> FastAPI:
     app.include_router(marketing.router, prefix=API_PREFIX)
     app.include_router(discovery.router, prefix=API_PREFIX)
     app.include_router(workspace.router, prefix=API_PREFIX)
+    app.include_router(export.router, prefix=API_PREFIX)
     return app
 
 

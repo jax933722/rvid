@@ -10,7 +10,9 @@ from __future__ import annotations
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from bise.application.dto.export_dto import ExportFormat
 from bise.application.ports.discovery import DiscoverySourcePort
+from bise.application.ports.exporter import ExporterPort
 from bise.application.ports.fetcher import PageFetcherPort
 from bise.application.ports.html_parser import HtmlParserPort
 from bise.application.ports.marketing_detector import MarketingDetectorPort
@@ -32,6 +34,8 @@ from bise.application.use_cases.enrichment.list_company_marketing import ListCom
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
+from bise.application.use_cases.export.export_list import ExportListMembers
+from bise.application.use_cases.export.export_search import ExportSearchResults
 from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
 from bise.application.use_cases.search.search_companies import SearchCompanies
 from bise.application.use_cases.workspace.lists import (
@@ -61,6 +65,7 @@ from bise.infrastructure.crawling.httpx_fetcher import FetcherConfig, HttpxPageF
 from bise.infrastructure.db.engine import create_db_engine, create_session_factory
 from bise.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
 from bise.infrastructure.discovery.overpass_source import OverpassDiscoverySource
+from bise.infrastructure.export.exporters import build_exporter
 from bise.infrastructure.pagespeed.null_provider import NullPageSpeedProvider
 from bise.infrastructure.search.sql_search_adapter import SqlSearchAdapter
 from config.settings import Settings, get_settings
@@ -221,3 +226,13 @@ class Container:
 
     def list_company_tags(self) -> ListCompanyTags:
         return ListCompanyTags(self.unit_of_work())
+
+    # --- Export ---
+    def exporter(self, fmt: ExportFormat) -> ExporterPort:
+        return build_exporter(fmt)
+
+    def export_search_results(self, fmt: ExportFormat) -> ExportSearchResults:
+        return ExportSearchResults(self.search_index(), self.exporter(fmt))
+
+    def export_list_members(self, fmt: ExportFormat) -> ExportListMembers:
+        return ExportListMembers(self.unit_of_work(), self.exporter(fmt))
