@@ -27,6 +27,13 @@ class CreateCompanyRequest(BaseModel):
     legal_name: str | None = Field(default=None, examples=["Acme Dental Pty Ltd"])
     industry: str | None = Field(default=None, examples=["Dentistry"])
     size_bucket: str | None = Field(default=None, examples=["10-50"])
+    country: str | None = Field(default=None, examples=["Australia"])
+    state: str | None = Field(default=None, examples=["NSW"])
+    city: str | None = Field(default=None, examples=["Sydney"])
+    founded_year: int | None = Field(default=None, examples=[2012])
+    employee_count: int | None = Field(default=None, examples=[25])
+    contact_email: str | None = Field(default=None, examples=["hello@acme.com"])
+    contact_phone: str | None = Field(default=None, examples=["+61 2 9000 0000"])
     domains: list[NewDomainRequest] = Field(default_factory=list)
 
     def to_command(self) -> CreateCompanyCommand:
@@ -36,6 +43,13 @@ class CreateCompanyRequest(BaseModel):
             legal_name=self.legal_name,
             industry=self.industry,
             size_bucket=self.size_bucket,
+            country=self.country,
+            state=self.state,
+            city=self.city,
+            founded_year=self.founded_year,
+            employee_count=self.employee_count,
+            contact_email=self.contact_email,
+            contact_phone=self.contact_phone,
             domains=tuple(
                 NewDomainDTO(hostname=d.hostname, is_primary=d.is_primary) for d in self.domains
             ),

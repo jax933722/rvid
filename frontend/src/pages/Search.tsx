@@ -5,7 +5,12 @@ import { Button, Card, Spinner } from "@/components/ui";
 import { CompanyPreview } from "@/features/search/CompanyPreview";
 import { FiltersPanel } from "@/features/search/FiltersPanel";
 import { ResultsTable } from "@/features/search/ResultsTable";
-import { EMPTY_STATE, toRequest, type SearchFormState } from "@/features/search/types";
+import {
+  activeFilterCount,
+  EMPTY_STATE,
+  toRequest,
+  type SearchFormState,
+} from "@/features/search/types";
 
 export function SearchPage() {
   const [state, setState] = useState<SearchFormState>(EMPTY_STATE);
@@ -20,19 +25,35 @@ export function SearchPage() {
 
   const result = query.data;
   const totalPages = result ? Math.max(1, Math.ceil(result.total / result.page_size)) : 1;
+  const filterCount = activeFilterCount(state);
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[16rem_minmax(0,1fr)_20rem]">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[17rem_minmax(0,1fr)_20rem]">
       <Card className="h-fit">
-        <h2 className="mb-3 font-semibold">Filters</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-semibold">Filters</h2>
+          {filterCount > 0 && (
+            <span className="rounded-full bg-brand-600 px-2 py-0.5 text-xs font-medium text-white">
+              {filterCount}
+            </span>
+          )}
+        </div>
         <FiltersPanel state={state} facets={result?.facets ?? {}} onChange={setState} />
       </Card>
 
       <Card className="min-w-0">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="font-semibold">
-            Results {result ? <span className="text-slate-400">· {result.total}</span> : null}
-          </h2>
+          <div>
+            <h2 className="font-semibold">
+              Prospector{" "}
+              {result ? (
+                <span className="text-slate-400">· {result.total} companies</span>
+              ) : null}
+            </h2>
+            <p className="text-xs text-slate-500">
+              Filters apply live · OR within a field, AND across fields
+            </p>
+          </div>
           {query.isFetching && <span className="text-xs text-slate-400">updating…</span>}
         </div>
         {query.isLoading ? (

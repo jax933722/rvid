@@ -23,6 +23,28 @@ const columns = [
     header: "Industry",
     cell: (c) => c.getValue() ?? "—",
   }),
+  columnHelper.display({
+    id: "location",
+    header: "Location",
+    cell: (c) => {
+      const { city, state, country } = c.row.original;
+      const place = [city, state, country].filter(Boolean).join(", ");
+      return place || "—";
+    },
+  }),
+  columnHelper.display({
+    id: "firmographics",
+    header: "Founded · Size",
+    cell: (c) => {
+      const { founded_year, employee_count } = c.row.original;
+      if (founded_year == null && employee_count == null) return "—";
+      const parts = [
+        founded_year != null ? `est. ${founded_year}` : null,
+        employee_count != null ? `${employee_count} staff` : null,
+      ].filter(Boolean);
+      return <span className="text-xs text-slate-500">{parts.join(" · ")}</span>;
+    },
+  }),
   columnHelper.accessor("seo_grade", {
     header: "SEO",
     cell: (c) => {

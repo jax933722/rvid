@@ -42,6 +42,11 @@ class Demo:
     seo_score: float
     pages: list[PageType]
     marketing: list[tuple[str, str]]  # (tool, category)
+    city: str
+    state: str
+    country: str
+    founded_year: int
+    employee_count: int
 
 
 DEMOS = [
@@ -58,6 +63,11 @@ DEMOS = [
         42.0,
         [PageType.CONTACT, PageType.CAREERS],
         [("Meta Pixel", "Marketing Pixel"), ("WhatsApp", "Messaging")],
+        city="Sydney",
+        state="NSW",
+        country="Australia",
+        founded_year=2008,
+        employee_count=24,
     ),
     Demo(
         "BrightSmile Orthodontics",
@@ -68,6 +78,11 @@ DEMOS = [
         88.0,
         [PageType.CONTACT, PageType.BLOG],
         [("Google Tag Manager", "Tag Manager"), ("Calendly", "Appointment Booking")],
+        city="Melbourne",
+        state="VIC",
+        country="Australia",
+        founded_year=2016,
+        employee_count=8,
     ),
     Demo(
         "Coastal Plumbing",
@@ -78,6 +93,11 @@ DEMOS = [
         71.0,
         [PageType.CONTACT],
         [("Mailchimp", "Lead / Newsletter Form")],
+        city="Gold Coast",
+        state="QLD",
+        country="Australia",
+        founded_year=2011,
+        employee_count=33,
     ),
     Demo(
         "Nimbus Software",
@@ -92,6 +112,11 @@ DEMOS = [
         93.0,
         [PageType.CAREERS, PageType.BLOG],
         [("Google Analytics 4", "Analytics"), ("Intercom", "Chat / Widget")],
+        city="Sydney",
+        state="NSW",
+        country="Australia",
+        founded_year=2019,
+        employee_count=140,
     ),
     Demo(
         "GreenLeaf Cafe",
@@ -102,6 +127,11 @@ DEMOS = [
         56.0,
         [PageType.CONTACT],
         [("OneTrust", "Cookie / Consent")],
+        city="Perth",
+        state="WA",
+        country="Australia",
+        founded_year=2014,
+        employee_count=6,
     ),
     Demo(
         "Urban Fitness",
@@ -112,6 +142,11 @@ DEMOS = [
         64.0,
         [PageType.CONTACT, PageType.CAREERS],
         [("Meta Pixel", "Marketing Pixel"), ("TikTok Pixel", "Marketing Pixel")],
+        city="Brisbane",
+        state="QLD",
+        country="Australia",
+        founded_year=2017,
+        employee_count=45,
     ),
 ]
 
@@ -147,6 +182,11 @@ def seed() -> None:
                 display_name=demo.name,
                 industry=demo.industry,
                 size_bucket=demo.size,
+                city=demo.city,
+                state=demo.state,
+                country=demo.country,
+                founded_year=demo.founded_year,
+                employee_count=demo.employee_count,
                 domains=(NewDomainDTO(hostname=demo.host, is_primary=True),),
             )
         )

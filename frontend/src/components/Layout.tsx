@@ -5,7 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 const NAV = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/discover", label: "Discover" },
-  { to: "/search", label: "Search" },
+  { to: "/search", label: "Prospector" },
   { to: "/crawlers", label: "Crawler Monitor" },
   { to: "/settings", label: "Settings" },
 ];

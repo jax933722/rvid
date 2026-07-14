@@ -22,6 +22,13 @@ export interface Company {
   status: string;
   industry: string | null;
   size_bucket: string | null;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  founded_year: number | null;
+  employee_count: number | null;
+  contact_email: string | null;
+  contact_phone: string | null;
   domains: DomainResponse[];
   created_at: string;
   updated_at: string;
@@ -78,7 +85,7 @@ export interface SeoProfile {
   scanned_at: string;
 }
 
-export type FilterOp = "eq" | "in" | "gte" | "lte" | "contains" | "is_true";
+export type FilterOp = "eq" | "in" | "gte" | "lte" | "between" | "contains" | "is_true";
 
 export interface SearchFilter {
   field: string;
@@ -101,6 +108,11 @@ export interface SearchItem {
   primary_domain: string | null;
   industry: string | null;
   country: string | null;
+  state: string | null;
+  city: string | null;
+  size_bucket: string | null;
+  founded_year: number | null;
+  employee_count: number | null;
   seo_score: number | null;
   seo_grade: string | null;
   technologies: string[];

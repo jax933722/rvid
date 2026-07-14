@@ -27,6 +27,13 @@ class CreateCompany:
             legal_name=command.legal_name,
             industry=command.industry,
             size_bucket=command.size_bucket,
+            country=command.country,
+            state=command.state,
+            city=command.city,
+            founded_year=command.founded_year,
+            employee_count=command.employee_count,
+            contact_email=command.contact_email,
+            contact_phone=command.contact_phone,
         )
         for d in command.domains:
             company.add_domain(WebsiteDomain(hostname=d.hostname, is_primary=d.is_primary))
