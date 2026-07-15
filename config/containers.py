@@ -17,6 +17,7 @@ from bise.application.ports.fetcher import PageFetcherPort
 from bise.application.ports.html_parser import HtmlParserPort
 from bise.application.ports.marketing_detector import MarketingDetectorPort
 from bise.application.ports.page_speed import PageSpeedPort
+from bise.application.ports.rate_limiter import RateLimiterPort
 from bise.application.ports.search import SearchIndexPort
 from bise.application.ports.seo_analyzer import SeoAnalyzerPort
 from bise.application.ports.technology_detector import TechnologyDetectorPort
@@ -75,6 +76,7 @@ from bise.infrastructure.db.unit_of_work import SqlAlchemyUnitOfWork
 from bise.infrastructure.discovery.overpass_source import OverpassDiscoverySource
 from bise.infrastructure.export.exporters import build_exporter
 from bise.infrastructure.pagespeed.null_provider import NullPageSpeedProvider
+from bise.infrastructure.ratelimit.token_bucket import InMemoryTokenBucketLimiter
 from bise.infrastructure.search.sql_search_adapter import SqlSearchAdapter
 from config.settings import Settings, get_settings
 
@@ -95,6 +97,7 @@ class Container:
         self._marketing_detector: MarketingDetectorPort | None = None
         self._discovery_source: DiscoverySourcePort | None = None
         self._default_workspace_id: int | None = None
+        self._rate_limiter: RateLimiterPort | None = None
 
     def unit_of_work(self) -> SqlAlchemyUnitOfWork:
         """Create a fresh Unit of Work (one transactional scope per use case call)."""
@@ -142,6 +145,14 @@ class Container:
         if self._search_index is None:
             self._search_index = SqlSearchAdapter(self.session_factory)
         return self._search_index
+
+    def rate_limiter(self) -> RateLimiterPort:
+        if self._rate_limiter is None:
+            self._rate_limiter = InMemoryTokenBucketLimiter(
+                capacity=self.settings.rate_limit_burst,
+                refill_per_second=self.settings.rate_limit_per_minute / 60.0,
+            )
+        return self._rate_limiter
 
     # --- Use case factories (a new UoW per call keeps sessions request-scoped) ---
     def create_company(self) -> CreateCompany:

@@ -61,6 +61,12 @@ class Settings(BaseSettings):
     auth_enabled: bool = False
     default_workspace_slug: str = "default"
 
+    # --- Rate limiting (token bucket, per API key / client) ---
+    rate_limit_enabled: bool = True
+    # Sustained requests allowed per minute, and the maximum instantaneous burst.
+    rate_limit_per_minute: int = 300
+    rate_limit_burst: int = 300
+
     @field_validator("database_url")
     @classmethod
     def _database_url_not_empty(cls, value: str) -> str:
