@@ -18,11 +18,23 @@ const FLAG_LABELS: Record<keyof SearchFormState["flags"], string> = {
 };
 
 const SEO_GRADES = ["A", "B", "C", "D", "F"];
+const ROLES = [
+  ["founder", "Founder"],
+  ["ceo", "CEO"],
+  ["cto", "CTO"],
+  ["cfo", "CFO"],
+  ["coo", "COO"],
+  ["cmo", "CMO"],
+  ["vp", "VP"],
+  ["director", "Director"],
+  ["head", "Head"],
+  ["manager", "Manager"],
+] as const;
 
 export function FiltersPanel({ state, facets, onChange }: Props) {
   const set = (patch: Partial<SearchFormState>) => onChange({ ...state, ...patch, page: 1 });
 
-  const toggle = (key: "technologies" | "industries" | "seoGrades", value: string) => {
+  const toggle = (key: "technologies" | "industries" | "seoGrades" | "roles", value: string) => {
     const current = state[key];
     const has = current.includes(value);
     set({ [key]: has ? current.filter((v) => v !== value) : [...current, value] } as Partial<
@@ -107,6 +119,24 @@ export function FiltersPanel({ state, facets, onChange }: Props) {
           onClear={() => set({ technologies: [] })}
           emptyHint="Search to see technologies"
         />
+      </Group>
+
+      <Group title="People">
+        <div>
+          <span className="mb-1 block font-medium">Has role</span>
+          <div className="flex flex-wrap gap-1">
+            {ROLES.map(([value, label]) => (
+              <Chip
+                key={value}
+                active={state.roles.includes(value)}
+                onClick={() => toggle("roles", value)}
+              >
+                {label}
+              </Chip>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-slate-400">From public team pages · enrich to populate</p>
+        </div>
       </Group>
 
       <Group title="SEO quality">

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { api } from "@/api/client";
 import { Badge, Card, gradeTone, Spinner } from "@/components/ui";
+import { PeopleList } from "@/features/people/PeopleList";
 import { CompanyWorkspacePanel } from "@/features/workspace/CompanyWorkspacePanel";
 
 export function CompanyPreview({ companyId }: { companyId: number | null }) {
@@ -75,6 +76,8 @@ export function CompanyPreview({ companyId }: { companyId: number | null }) {
           </div>
         </Card>
       )}
+      <PeopleList companyId={companyId} />
+
       <CompanyWorkspacePanel companyId={companyId} />
 
       <Link

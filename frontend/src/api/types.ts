@@ -155,6 +155,17 @@ export interface CompanyTag {
   created_at: string;
 }
 
+export interface Person {
+  id: number | null;
+  company_id: number;
+  name: string;
+  title: string | null;
+  role_category: string;
+  email: string | null;
+  email_status: string; // "published" | "guessed" | "none"
+  source_url: string | null;
+}
+
 export interface Workspace {
   id: number | null;
   name: string;

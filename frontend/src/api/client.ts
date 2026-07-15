@@ -11,6 +11,7 @@ import type {
   DiscoveredBusiness,
   EnqueueResult,
   Page,
+  Person,
   QueueSummary,
   SavedSearch,
   SearchRequest,
@@ -91,6 +92,8 @@ export const api = {
     request<CompanyTechnology[]>(`/companies/${id}/technologies`),
 
   companySeo: (id: number) => request<SeoProfile>(`/companies/${id}/seo`),
+
+  companyPeople: (id: number) => request<Person[]>(`/companies/${id}/people`),
 
   listCrawlJobs: (page = 1, pageSize = 25, status?: string) =>
     request<Page<CrawlJob>>(

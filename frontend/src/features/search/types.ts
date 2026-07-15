@@ -14,6 +14,7 @@ export interface SearchFormState {
   state: string;
   city: string;
   technologies: string[];
+  roles: string[];
   founded: RangeState;
   employees: RangeState;
   seoGrades: string[];
@@ -34,6 +35,7 @@ export const EMPTY_STATE: SearchFormState = {
   state: "",
   city: "",
   technologies: [],
+  roles: [],
   founded: { ...EMPTY_RANGE },
   employees: { ...EMPTY_RANGE },
   seoGrades: [],
@@ -69,6 +71,7 @@ export function activeFilterCount(state: SearchFormState): number {
   if (state.state.trim()) n++;
   if (state.city.trim()) n++;
   if (state.technologies.length) n++;
+  if (state.roles.length) n++;
   if (state.founded.min.trim() || state.founded.max.trim()) n++;
   if (state.employees.min.trim() || state.employees.max.trim()) n++;
   if (state.seoGrades.length) n++;
@@ -109,6 +112,9 @@ export function fromRequest(req: SearchRequest): SearchFormState {
       case "technology":
         state.technologies = f.values;
         break;
+      case "role":
+        state.roles = f.values;
+        break;
       case "founded_year":
         state.founded = range(f.values, f.op);
         break;
@@ -143,6 +149,7 @@ export function toRequest(state: SearchFormState): SearchRequest {
 
   if (state.technologies.length)
     filters.push({ field: "technology", op: "contains", values: state.technologies });
+  if (state.roles.length) filters.push({ field: "role", op: "contains", values: state.roles });
 
   const founded = rangeFilter("founded_year", state.founded);
   if (founded) filters.push(founded);

@@ -26,6 +26,7 @@ from bise.application.dto.company_dto import CreateCompanyCommand, NewDomainDTO
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage, PageType
 from bise.domain.entities.marketing_signal import MarketingSignal
+from bise.domain.entities.person import EmailStatus, Person, RoleCategory
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology
 from bise.domain.value_objects.confidence import Confidence
@@ -151,6 +152,30 @@ DEMOS = [
 ]
 
 
+def _people(company_id: int, host: str) -> list[Person]:
+    """A small, deterministic leadership team for demo/screenshot purposes."""
+    return [
+        Person(
+            company_id=company_id,
+            name="Jordan Avery",
+            title="Founder & CEO",
+            role_category=RoleCategory.FOUNDER,
+            email=f"jordan.avery@{host}",
+            email_status=EmailStatus.PUBLISHED,
+            source_url=f"https://{host}/about",
+        ),
+        Person(
+            company_id=company_id,
+            name="Sam Rivera",
+            title="Chief Technology Officer",
+            role_category=RoleCategory.CTO,
+            email=f"sam.rivera@{host}",
+            email_status=EmailStatus.GUESSED,
+            source_url=f"https://{host}/about",
+        ),
+    ]
+
+
 def _seo_signals(host: str, score: float) -> SeoSignals:
     return SeoSignals(
         url=f"https://{host}/",
@@ -245,6 +270,7 @@ def seed() -> None:
                     for name, cat in demo.marketing
                 ],
             )
+            uow.people.replace_for_company(company_id, _people(company_id, demo.host))
             uow.commit()
 
         settings_container.rebuild_search_document().execute(company_id)
