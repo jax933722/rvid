@@ -40,6 +40,10 @@ class SearchDocumentModel(TimestampMixin, Base):
     # Pipe-delimited lowercased names (e.g. "|wordpress|shopify|") for portable
     # CONTAINS matching via LIKE across SQLite and PostgreSQL.
     technologies_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    # Role categories present at the company (e.g. "|founder|ceo|cto|"), for
+    # portable CONTAINS matching on the role filter.
+    roles: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    roles_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
     has_ssl: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
     has_contact_page: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     has_careers_page: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)

@@ -32,6 +32,7 @@ class SearchDocument:
     seo_score: float | None = None
     seo_grade: str | None = None
     technologies: list[str] = field(default_factory=list)
+    roles: list[str] = field(default_factory=list)
     has_ssl: bool = False
     has_contact_page: bool = False
     has_careers_page: bool = False

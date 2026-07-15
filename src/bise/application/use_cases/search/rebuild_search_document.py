@@ -40,7 +40,8 @@ class RebuildSearchDocument:
             ]
             seo = uow.seo_profiles.get_for_company(company_id)
             page_types, page_titles = self._page_signals(uow, company)
-            document = self._build(company, technologies, seo, page_types, page_titles)
+            roles = sorted({p.role_category.value for p in uow.people.list_for_company(company_id)})
+            document = self._build(company, technologies, seo, page_types, page_titles, roles)
 
         # Indexing happens outside the read transaction (own session in the adapter).
         self._search_index.upsert(document)
@@ -66,6 +67,7 @@ class RebuildSearchDocument:
         seo: SeoProfile | None,
         page_types: set[PageType],
         page_titles: list[str],
+        roles: list[str],
     ) -> SearchDocument:
         assert company.id is not None
         primary = company.primary_domain.hostname if company.primary_domain else None
@@ -97,6 +99,7 @@ class RebuildSearchDocument:
             seo_score=seo_score,
             seo_grade=seo_grade,
             technologies=technologies,
+            roles=roles,
             has_ssl=has_ssl,
             has_contact_page=PageType.CONTACT in page_types,
             has_careers_page=PageType.CAREERS in page_types,

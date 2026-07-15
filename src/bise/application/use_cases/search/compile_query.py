@@ -55,6 +55,7 @@ FIELD_SPECS: dict[str, FieldSpec] = {
     "founded_year": FieldSpec(FieldKind.NUMBER, _NUMBER_OPS),
     "employee_count": FieldSpec(FieldKind.NUMBER, _NUMBER_OPS),
     "technology": FieldSpec(FieldKind.LIST, _LIST_OPS),
+    "role": FieldSpec(FieldKind.LIST, _LIST_OPS),
     "has_ssl": FieldSpec(FieldKind.BOOL, _BOOL_OPS),
     "has_contact_page": FieldSpec(FieldKind.BOOL, _BOOL_OPS),
     "has_careers_page": FieldSpec(FieldKind.BOOL, _BOOL_OPS),

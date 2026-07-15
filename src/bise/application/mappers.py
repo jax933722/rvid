@@ -7,6 +7,7 @@ from bise.application.dto.company_dto import CompanyDTO, DomainDTO
 from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
 from bise.application.dto.enrichment_dto import EnrichmentJobDTO
 from bise.application.dto.marketing_dto import MarketingSignalDTO
+from bise.application.dto.person_dto import PersonDTO
 from bise.application.dto.seo_dto import SeoProfileDTO
 from bise.application.dto.technology_dto import CompanyTechnologyDTO, TechnologyDTO
 from bise.application.dto.workspace_dto import CompanyListDTO, CompanyTagDTO, SavedSearchDTO
@@ -18,6 +19,7 @@ from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage
 from bise.domain.entities.enrichment_job import EnrichmentJob
 from bise.domain.entities.marketing_signal import MarketingSignal
+from bise.domain.entities.person import Person
 from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
@@ -215,4 +217,18 @@ def api_key_to_dto(api_key: ApiKey) -> ApiKeyDTO:
         revoked=api_key.revoked,
         last_used_at=api_key.last_used_at,
         created_at=api_key.created_at,
+    )
+
+
+def person_to_dto(person: Person) -> PersonDTO:
+    """Convert a :class:`Person` entity into its boundary DTO."""
+    return PersonDTO(
+        id=person.id,
+        company_id=person.company_id,
+        name=person.name,
+        title=person.title,
+        role_category=person.role_category.value,
+        email=person.email,
+        email_status=person.email_status.value,
+        source_url=person.source_url,
     )

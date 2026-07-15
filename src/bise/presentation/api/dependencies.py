@@ -26,6 +26,7 @@ from bise.application.use_cases.enrichment.enqueue_enrichment import EnqueueEnri
 from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
 from bise.application.use_cases.enrichment.get_queue_summary import GetQueueSummary
 from bise.application.use_cases.enrichment.list_company_marketing import ListCompanyMarketing
+from bise.application.use_cases.enrichment.list_company_people import ListCompanyPeople
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
@@ -132,6 +133,10 @@ def get_detect_marketing(container: ContainerDep) -> DetectMarketing:
 
 def get_list_company_marketing(container: ContainerDep) -> ListCompanyMarketing:
     return container.list_company_marketing()
+
+
+def get_list_company_people(container: ContainerDep) -> ListCompanyPeople:
+    return container.list_company_people()
 
 
 def get_discover_businesses(container: ContainerDep) -> DiscoverBusinesses:

@@ -19,6 +19,7 @@ from bise.application.ports.repositories import (
     CrawlJobRepository,
     EnrichmentJobRepository,
     MarketingSignalRepository,
+    PersonRepository,
     SavedSearchRepository,
     SeoProfileRepository,
     TechnologyRepository,
@@ -36,6 +37,7 @@ class UnitOfWork(Protocol):
     company_technologies: CompanyTechnologyRepository
     seo_profiles: SeoProfileRepository
     marketing_signals: MarketingSignalRepository
+    people: PersonRepository
     saved_searches: SavedSearchRepository
     company_lists: CompanyListRepository
     company_tags: CompanyTagRepository

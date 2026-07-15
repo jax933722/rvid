@@ -18,6 +18,7 @@ from bise.application.ports.fetcher import PageFetcherPort
 from bise.application.ports.html_parser import HtmlParserPort
 from bise.application.ports.marketing_detector import MarketingDetectorPort
 from bise.application.ports.page_speed import PageSpeedPort
+from bise.application.ports.person_extractor import PersonExtractorPort
 from bise.application.ports.rate_limiter import RateLimiterPort
 from bise.application.ports.search import SearchIndexPort
 from bise.application.ports.seo_analyzer import SeoAnalyzerPort
@@ -38,9 +39,11 @@ from bise.application.use_cases.discovery.discover_businesses import DiscoverBus
 from bise.application.use_cases.enrichment.detect_marketing import DetectMarketing
 from bise.application.use_cases.enrichment.detect_technologies import DetectTechnologies
 from bise.application.use_cases.enrichment.enqueue_enrichment import EnqueueEnrichment
+from bise.application.use_cases.enrichment.extract_people import ExtractPeople
 from bise.application.use_cases.enrichment.get_company_seo import GetCompanySeo
 from bise.application.use_cases.enrichment.get_queue_summary import GetQueueSummary
 from bise.application.use_cases.enrichment.list_company_marketing import ListCompanyMarketing
+from bise.application.use_cases.enrichment.list_company_people import ListCompanyPeople
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
@@ -69,6 +72,7 @@ from bise.application.use_cases.workspace.tags import (
 from bise.crawlers.website_crawler import WebsiteCrawler
 from bise.infrastructure.analyzers.marketing_fingerprint import RuleBasedMarketingDetector
 from bise.infrastructure.analyzers.seo_analyzer import BeautifulSoupSeoAnalyzer
+from bise.infrastructure.analyzers.team_extractor import RuleBasedTeamExtractor
 from bise.infrastructure.analyzers.tech_fingerprint import RuleBasedTechnologyDetector
 from bise.infrastructure.cache.ttl_cache import InMemoryTTLCache
 from bise.infrastructure.crawling.html_parser import BeautifulSoupHtmlParser
@@ -97,6 +101,7 @@ class Container:
         self._page_speed: PageSpeedPort | None = None
         self._search_index: SearchIndexPort | None = None
         self._marketing_detector: MarketingDetectorPort | None = None
+        self._person_extractor: PersonExtractorPort | None = None
         self._discovery_source: DiscoverySourcePort | None = None
         self._default_workspace_id: int | None = None
         self._rate_limiter: RateLimiterPort | None = None
@@ -128,6 +133,11 @@ class Container:
         if self._marketing_detector is None:
             self._marketing_detector = RuleBasedMarketingDetector()
         return self._marketing_detector
+
+    def person_extractor(self) -> PersonExtractorPort:
+        if self._person_extractor is None:
+            self._person_extractor = RuleBasedTeamExtractor()
+        return self._person_extractor
 
     def discovery_source(self) -> DiscoverySourcePort:
         if self._discovery_source is None:
@@ -193,6 +203,12 @@ class Container:
 
     def detect_marketing(self) -> DetectMarketing:
         return DetectMarketing(self.unit_of_work(), self.marketing_detector())
+
+    def extract_people(self) -> ExtractPeople:
+        return ExtractPeople(self.unit_of_work(), self.person_extractor())
+
+    def list_company_people(self) -> ListCompanyPeople:
+        return ListCompanyPeople(self.unit_of_work())
 
     def list_company_marketing(self) -> ListCompanyMarketing:
         return ListCompanyMarketing(self.unit_of_work())

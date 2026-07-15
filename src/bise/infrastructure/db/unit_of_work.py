@@ -16,6 +16,7 @@ from bise.application.ports.repositories import (
     CrawlJobRepository,
     EnrichmentJobRepository,
     MarketingSignalRepository,
+    PersonRepository,
     SavedSearchRepository,
     SeoProfileRepository,
     TechnologyRepository,
@@ -36,6 +37,7 @@ from bise.infrastructure.db.repositories.enrichment_repository import (
 from bise.infrastructure.db.repositories.marketing_repository import (
     SqlAlchemyMarketingSignalRepository,
 )
+from bise.infrastructure.db.repositories.person_repository import SqlAlchemyPersonRepository
 from bise.infrastructure.db.repositories.seo_repository import SqlAlchemySeoProfileRepository
 from bise.infrastructure.db.repositories.technology_repository import (
     SqlAlchemyCompanyTechnologyRepository,
@@ -66,6 +68,7 @@ class SqlAlchemyUnitOfWork:
         self.company_technologies: CompanyTechnologyRepository
         self.seo_profiles: SeoProfileRepository
         self.marketing_signals: MarketingSignalRepository
+        self.people: PersonRepository
         self.saved_searches: SavedSearchRepository
         self.company_lists: CompanyListRepository
         self.company_tags: CompanyTagRepository
@@ -82,6 +85,7 @@ class SqlAlchemyUnitOfWork:
         self.company_technologies = SqlAlchemyCompanyTechnologyRepository(self._session)
         self.seo_profiles = SqlAlchemySeoProfileRepository(self._session)
         self.marketing_signals = SqlAlchemyMarketingSignalRepository(self._session)
+        self.people = SqlAlchemyPersonRepository(self._session)
         self.saved_searches = SqlAlchemySavedSearchRepository(self._session)
         self.company_lists = SqlAlchemyCompanyListRepository(self._session)
         self.company_tags = SqlAlchemyCompanyTagRepository(self._session)

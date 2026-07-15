@@ -18,6 +18,7 @@ from bise.domain.entities.crawl_job import CrawlJob, CrawlJobStatus
 from bise.domain.entities.crawled_page import CrawledPage
 from bise.domain.entities.enrichment_job import EnrichmentJob, EnrichmentJobStatus
 from bise.domain.entities.marketing_signal import MarketingSignal
+from bise.domain.entities.person import Person
 from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
@@ -183,6 +184,18 @@ class CompanyListRepository(Protocol):
 
     def list_members(self, list_id: int) -> Sequence[Company]:
         """Return the companies in a list, newest membership first."""
+        ...
+
+
+class PersonRepository(Protocol):
+    """Persistence for people extracted from a company's website (shared data)."""
+
+    def replace_for_company(self, company_id: int, people: list[Person]) -> None:
+        """Replace all people for a company (idempotent re-extraction)."""
+        ...
+
+    def list_for_company(self, company_id: int) -> Sequence[Person]:
+        """Return the company's people, seniority first then name."""
         ...
 
 

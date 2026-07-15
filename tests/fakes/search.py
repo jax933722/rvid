@@ -62,7 +62,8 @@ class InMemorySearchIndex:
     @staticmethod
     def _predicate(doc: SearchDocument, p: Predicate) -> bool:
         if p.kind is FieldKind.LIST:
-            owned = {t.lower() for t in doc.technologies}
+            source = doc.roles if p.field == "role" else doc.technologies
+            owned = {t.lower() for t in source}
             return any(v.lower() in owned for v in p.values)
 
         value = getattr(doc, p.field)
@@ -112,6 +113,8 @@ class InMemorySearchIndex:
             for doc in docs:
                 if field == "technology":
                     counter.update(doc.technologies)
+                elif field == "role":
+                    counter.update(doc.roles)
                 else:
                     value = getattr(doc, field)
                     if value is not None:

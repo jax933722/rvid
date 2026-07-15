@@ -35,6 +35,7 @@ def enrich_company(container: Container, company_id: int) -> None:
 
     container.detect_technologies().execute(company_id)
     container.detect_marketing().execute(company_id)
+    container.extract_people().execute(company_id)
     try:
         container.run_seo_scan().execute(company_id)
     except NotFoundError:

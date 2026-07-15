@@ -9,13 +9,16 @@ from fastapi import APIRouter, Depends, Query, status
 from bise.application.use_cases.companies.create_company import CreateCompany
 from bise.application.use_cases.companies.get_company import GetCompany
 from bise.application.use_cases.companies.list_companies import ListCompanies
+from bise.application.use_cases.enrichment.list_company_people import ListCompanyPeople
 from bise.presentation.api.dependencies import (
     get_create_company,
     get_get_company,
     get_list_companies,
+    get_list_company_people,
 )
 from bise.presentation.api.schemas.common import PageResponse
 from bise.presentation.api.schemas.company import CompanyResponse, CreateCompanyRequest
+from bise.presentation.api.schemas.person import PersonResponse
 from bise.shared.pagination import PageRequest
 
 router = APIRouter(prefix="/companies", tags=["companies"])
@@ -68,3 +71,16 @@ async def get_company(
     """Return a single company's full profile, or 404 if it does not exist."""
     dto = use_case.execute(company_id)
     return CompanyResponse.from_dto(dto)
+
+
+@router.get(
+    "/{company_id}/people",
+    response_model=list[PersonResponse],
+    summary="List people published on a company's site",
+)
+async def list_company_people(
+    company_id: int,
+    use_case: Annotated[ListCompanyPeople, Depends(get_list_company_people)],
+) -> list[PersonResponse]:
+    """Return the company's team members (name, role, and public/guessed email)."""
+    return [PersonResponse.from_dto(p) for p in use_case.execute(company_id)]

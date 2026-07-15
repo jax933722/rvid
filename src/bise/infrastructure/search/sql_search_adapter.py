@@ -70,6 +70,8 @@ class SqlSearchAdapter:
         model.seo_grade = doc.seo_grade
         model.technologies = doc.technologies
         model.technologies_text = _tech_text(doc.technologies)
+        model.roles = doc.roles
+        model.roles_text = _tech_text(doc.roles)
         model.has_ssl = doc.has_ssl
         model.has_contact_page = doc.has_contact_page
         model.has_careers_page = doc.has_careers_page
@@ -118,9 +120,13 @@ class SqlSearchAdapter:
         conditions.extend(self._predicate(p) for p in query.predicates)
         return conditions
 
+    # Multi-valued fields map to a pipe-delimited text column for LIKE matching.
+    _LIST_COLUMNS = {"technology": _M.technologies_text, "role": _M.roles_text}
+
     def _predicate(self, p: Predicate) -> ColumnElement[bool]:
-        if p.kind is FieldKind.LIST:  # technology CONTAINS (any-of => OR)
-            clauses = [_M.technologies_text.like(f"%|{v.lower()}|%") for v in p.values]
+        if p.kind is FieldKind.LIST:  # CONTAINS (any-of => OR)
+            list_column = self._LIST_COLUMNS[p.field]
+            clauses = [list_column.like(f"%|{v.lower()}|%") for v in p.values]
             return or_(*clauses)
 
         column: InstrumentedAttribute[Any] = getattr(_M, p.field)
@@ -181,7 +187,9 @@ class SqlSearchAdapter:
         facets: dict[str, list[FacetValue]] = {}
         for field in facet_fields:
             if field == "technology":
-                facets[field] = self._technology_facet(session, conditions)
+                facets[field] = self._list_facet(session, conditions, _M.technologies)
+            elif field == "role":
+                facets[field] = self._list_facet(session, conditions, _M.roles)
             else:
                 facets[field] = self._column_facet(session, conditions, field)
         return facets
@@ -200,11 +208,13 @@ class SqlSearchAdapter:
         return [FacetValue(value=str(value), count=count) for value, count in rows]
 
     @staticmethod
-    def _technology_facet(
-        session: Session, conditions: Sequence[ColumnElement[bool]]
+    def _list_facet(
+        session: Session,
+        conditions: Sequence[ColumnElement[bool]],
+        column: InstrumentedAttribute[Any],
     ) -> list[FacetValue]:
-        rows = session.scalars(select(SearchDocumentModel.technologies).where(*conditions)).all()
+        rows = session.scalars(select(column).where(*conditions)).all()
         counter: Counter[str] = Counter()
-        for techs in rows:
-            counter.update(techs or [])
+        for values in rows:
+            counter.update(values or [])
         return [FacetValue(value=name, count=count) for name, count in counter.most_common()]
