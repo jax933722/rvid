@@ -11,6 +11,7 @@ from sqlalchemy import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from bise.application.dto.export_dto import ExportFormat
+from bise.application.ports.cache import CachePort
 from bise.application.ports.discovery import DiscoverySourcePort
 from bise.application.ports.exporter import ExporterPort
 from bise.application.ports.fetcher import PageFetcherPort
@@ -69,6 +70,7 @@ from bise.crawlers.website_crawler import WebsiteCrawler
 from bise.infrastructure.analyzers.marketing_fingerprint import RuleBasedMarketingDetector
 from bise.infrastructure.analyzers.seo_analyzer import BeautifulSoupSeoAnalyzer
 from bise.infrastructure.analyzers.tech_fingerprint import RuleBasedTechnologyDetector
+from bise.infrastructure.cache.ttl_cache import InMemoryTTLCache
 from bise.infrastructure.crawling.html_parser import BeautifulSoupHtmlParser
 from bise.infrastructure.crawling.httpx_fetcher import FetcherConfig, HttpxPageFetcher
 from bise.infrastructure.db.engine import create_db_engine, create_session_factory
@@ -98,6 +100,7 @@ class Container:
         self._discovery_source: DiscoverySourcePort | None = None
         self._default_workspace_id: int | None = None
         self._rate_limiter: RateLimiterPort | None = None
+        self._search_cache: CachePort | None = None
 
     def unit_of_work(self) -> SqlAlchemyUnitOfWork:
         """Create a fresh Unit of Work (one transactional scope per use case call)."""
@@ -153,6 +156,12 @@ class Container:
                 refill_per_second=self.settings.rate_limit_per_minute / 60.0,
             )
         return self._rate_limiter
+
+    def search_cache(self) -> CachePort:
+        """Process-wide cache for search responses (invalidated on index writes)."""
+        if self._search_cache is None:
+            self._search_cache = InMemoryTTLCache()
+        return self._search_cache
 
     # --- Use case factories (a new UoW per call keeps sessions request-scoped) ---
     def create_company(self) -> CreateCompany:

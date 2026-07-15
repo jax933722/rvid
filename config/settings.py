@@ -67,6 +67,10 @@ class Settings(BaseSettings):
     rate_limit_per_minute: int = 300
     rate_limit_burst: int = 300
 
+    # --- Response caching (search results) ---
+    cache_enabled: bool = True
+    cache_ttl_seconds: float = 30.0
+
     @field_validator("database_url")
     @classmethod
     def _database_url_not_empty(cls, value: str) -> str:

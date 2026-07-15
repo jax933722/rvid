@@ -64,4 +64,6 @@ async def run_queue(
     process against the same database instead.
     """
     processed = process_enrichment_jobs(container, max_jobs=max_jobs)
+    if processed:
+        container.search_cache().clear()  # enriched companies changed the index
     return {"processed": processed}

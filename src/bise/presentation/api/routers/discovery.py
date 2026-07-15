@@ -41,4 +41,5 @@ async def enrich(company_id: int, container: ContainerDep) -> dict[str, str | in
     and marketing, scan SEO, and rebuild its search index. Performs live network
     I/O, so it runs synchronously for a single company."""
     enrich_company(container, company_id)
+    container.search_cache().clear()  # enrichment changed the index — drop stale cache
     return {"status": "enriched", "company_id": company_id}
