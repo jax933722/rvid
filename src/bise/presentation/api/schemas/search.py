@@ -63,6 +63,11 @@ class SearchItemResponse(BaseModel):
     primary_domain: str | None
     industry: str | None
     country: str | None
+    state: str | None
+    city: str | None
+    size_bucket: str | None
+    founded_year: int | None
+    employee_count: int | None
     seo_score: float | None
     seo_grade: str | None
     technologies: list[str]
@@ -94,6 +99,11 @@ class SearchResponse(BaseModel):
                     primary_domain=i.primary_domain,
                     industry=i.industry,
                     country=i.country,
+                    state=i.state,
+                    city=i.city,
+                    size_bucket=i.size_bucket,
+                    founded_year=i.founded_year,
+                    employee_count=i.employee_count,
                     seo_score=i.seo_score,
                     seo_grade=i.seo_grade,
                     technologies=i.technologies,

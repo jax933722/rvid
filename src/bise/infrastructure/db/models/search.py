@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from bise.infrastructure.db.base import Base, TimestampMixin
@@ -32,12 +32,18 @@ class SearchDocumentModel(TimestampMixin, Base):
     state: Mapped[str | None] = mapped_column(String(128), index=True)
     city: Mapped[str | None] = mapped_column(String(128), index=True)
     size_bucket: Mapped[str | None] = mapped_column(String(32), index=True)
+    founded_year: Mapped[int | None] = mapped_column(Integer, index=True)
+    employee_count: Mapped[int | None] = mapped_column(Integer, index=True)
     seo_score: Mapped[float | None] = mapped_column(Float, index=True)
     seo_grade: Mapped[str | None] = mapped_column(String(1), index=True)
     technologies: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
     # Pipe-delimited lowercased names (e.g. "|wordpress|shopify|") for portable
     # CONTAINS matching via LIKE across SQLite and PostgreSQL.
     technologies_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    # Role categories present at the company (e.g. "|founder|ceo|cto|"), for
+    # portable CONTAINS matching on the role filter.
+    roles: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    roles_text: Mapped[str] = mapped_column(Text, nullable=False, default="")
     has_ssl: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, index=True)
     has_contact_page: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     has_careers_page: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)

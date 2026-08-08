@@ -4,7 +4,10 @@ import { useTheme } from "@/hooks/useTheme";
 
 const NAV = [
   { to: "/", label: "Dashboard", end: true },
-  { to: "/search", label: "Search" },
+  { to: "/discover", label: "Discover" },
+  { to: "/campaigns", label: "Lead Engine" },
+  { to: "/search", label: "Prospector" },
+  { to: "/lists", label: "Lists" },
   { to: "/crawlers", label: "Crawler Monitor" },
   { to: "/settings", label: "Settings" },
 ];

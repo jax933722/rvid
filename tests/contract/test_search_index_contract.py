@@ -68,11 +68,14 @@ def _seed(h: IndexHarness) -> None:
             acme,
             "Acme Dental",
             industry="Dentistry",
+            city="Sydney",
+            founded_year=2005,
+            employee_count=12,
             seo_score=40.0,
             seo_grade="D",
             technologies=["WordPress"],
             has_contact_page=True,
-            text_blob="acme dental wordpress",
+            text_blob="acme dental wordpress sydney",
         )
     )
     h.index.upsert(
@@ -80,11 +83,14 @@ def _seed(h: IndexHarness) -> None:
             beta,
             "Beta Plumbing",
             industry="Plumbing",
+            city="Melbourne",
+            founded_year=2018,
+            employee_count=80,
             seo_score=80.0,
             seo_grade="B",
             technologies=["Shopify"],
             has_contact_page=False,
-            text_blob="beta plumbing shopify",
+            text_blob="beta plumbing shopify melbourne",
         )
     )
 
@@ -125,6 +131,37 @@ def test_numeric_and_bool(harness: IndexHarness) -> None:
         compile_query(SearchQuery(filters=(Filter("has_contact_page", FilterOp.IS_TRUE),)))
     )
     assert contact.total == 1
+
+
+def test_between_founded_year(harness: IndexHarness) -> None:
+    _seed(harness)
+    result = harness.index.search(
+        compile_query(
+            SearchQuery(filters=(Filter("founded_year", FilterOp.BETWEEN, ("2000", "2010")),))
+        )
+    )
+    assert {i.display_name for i in result.items} == {"Acme Dental"}
+
+
+def test_multi_select_city_via_in(harness: IndexHarness) -> None:
+    _seed(harness)
+    result = harness.index.search(
+        compile_query(
+            SearchQuery(filters=(Filter("city", FilterOp.IN, ("Sydney", "Melbourne")),))
+        )
+    )
+    assert result.total == 2
+
+
+def test_result_item_carries_firmographics(harness: IndexHarness) -> None:
+    _seed(harness)
+    result = harness.index.search(
+        compile_query(SearchQuery(filters=(Filter("city", FilterOp.EQ, ("Sydney",)),)))
+    )
+    item = result.items[0]
+    assert item.city == "Sydney"
+    assert item.founded_year == 2005
+    assert item.employee_count == 12
 
 
 def test_facets(harness: IndexHarness) -> None:

@@ -10,13 +10,22 @@ from types import TracebackType
 from typing import Protocol
 
 from bise.application.ports.repositories import (
+    ApiKeyRepository,
+    CompanyListRepository,
     CompanyRepository,
+    CompanyTagRepository,
     CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
+    EnrichmentJobRepository,
+    LeadCampaignRepository,
+    LeadRepository,
     MarketingSignalRepository,
+    PersonRepository,
+    SavedSearchRepository,
     SeoProfileRepository,
     TechnologyRepository,
+    WorkspaceRepository,
 )
 
 
@@ -30,6 +39,15 @@ class UnitOfWork(Protocol):
     company_technologies: CompanyTechnologyRepository
     seo_profiles: SeoProfileRepository
     marketing_signals: MarketingSignalRepository
+    people: PersonRepository
+    saved_searches: SavedSearchRepository
+    company_lists: CompanyListRepository
+    company_tags: CompanyTagRepository
+    enrichment_jobs: EnrichmentJobRepository
+    workspaces: WorkspaceRepository
+    api_keys: ApiKeyRepository
+    lead_campaigns: LeadCampaignRepository
+    leads: LeadRepository
 
     def __enter__(self) -> UnitOfWork: ...
 

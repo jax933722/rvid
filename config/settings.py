@@ -54,6 +54,23 @@ class Settings(BaseSettings):
     log_level: LogLevel = "INFO"
     log_json: bool = True
 
+    # --- Auth / multi-tenancy (opt-in) ---
+    # When False (default) every request runs in the default workspace with no
+    # credentials, so local/dev use needs no setup. A deployer sets this True to
+    # require a valid API key on protected endpoints.
+    auth_enabled: bool = False
+    default_workspace_slug: str = "default"
+
+    # --- Rate limiting (token bucket, per API key / client) ---
+    rate_limit_enabled: bool = True
+    # Sustained requests allowed per minute, and the maximum instantaneous burst.
+    rate_limit_per_minute: int = 300
+    rate_limit_burst: int = 300
+
+    # --- Response caching (search results) ---
+    cache_enabled: bool = True
+    cache_ttl_seconds: float = 30.0
+
     @field_validator("database_url")
     @classmethod
     def _database_url_not_empty(cls, value: str) -> str:

@@ -1,14 +1,28 @@
 // Typed client for the Search API. The only place the frontend talks HTTP.
 
 import type {
+  ApiKey,
+  CampaignRunResult,
   Company,
+  CompanyList,
+  CompanyTag,
   CompanyTechnology,
   CrawlJob,
+  CreateCampaignBody,
+  CreatedApiKey,
+  DiscoveredBusiness,
+  EnqueueResult,
+  Lead,
+  LeadCampaign,
   Page,
+  Person,
+  QueueSummary,
+  SavedSearch,
   SearchRequest,
   SearchResult,
   SeoProfile,
   Technology,
+  Workspace,
 } from "./types";
 
 const BASE = "/api/v1";
@@ -42,6 +56,28 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
+export type ExportFormat = "csv" | "json" | "xlsx";
+
+/** Fetch a binary payload and trigger a browser download using its filename. */
+async function download(path: string, init?: RequestInit): Promise<void> {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...init,
+  });
+  if (!res.ok) throw new ApiError(res.status, res.statusText);
+  const blob = await res.blob();
+  const disposition = res.headers.get("Content-Disposition") ?? "";
+  const filename = /filename="?([^"]+)"?/.exec(disposition)?.[1] ?? "export";
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 export const api = {
   health: () => request<{ status: string }>("/health"),
 
@@ -61,6 +97,8 @@ export const api = {
 
   companySeo: (id: number) => request<SeoProfile>(`/companies/${id}/seo`),
 
+  companyPeople: (id: number) => request<Person[]>(`/companies/${id}/people`),
+
   listCrawlJobs: (page = 1, pageSize = 25, status?: string) =>
     request<Page<CrawlJob>>(
       `/crawlers/jobs?page=${page}&page_size=${pageSize}${status ? `&status=${status}` : ""}`,
@@ -71,4 +109,115 @@ export const api = {
 
   reindexCompany: (id: number) =>
     request<{ status: string }>(`/companies/${id}/index`, { method: "POST" }),
+
+  discover: (category: string, location: string, limit = 50) =>
+    request<DiscoveredBusiness[]>("/discover", {
+      method: "POST",
+      body: JSON.stringify({ category, location, limit }),
+    }),
+
+  enrichCompany: (id: number) =>
+    request<{ status: string; company_id: number }>(`/companies/${id}/enrich`, { method: "POST" }),
+
+  // --- workspace: saved searches ---
+  listSavedSearches: () => request<SavedSearch[]>("/saved-searches"),
+
+  saveSearch: (name: string, query: SearchRequest) =>
+    request<SavedSearch>("/saved-searches", {
+      method: "POST",
+      body: JSON.stringify({ name, query }),
+    }),
+
+  deleteSavedSearch: (id: number) =>
+    request<void>(`/saved-searches/${id}`, { method: "DELETE" }),
+
+  // --- workspace: lists ---
+  listLists: () => request<CompanyList[]>("/lists"),
+
+  createList: (name: string, description?: string | null) =>
+    request<CompanyList>("/lists", {
+      method: "POST",
+      body: JSON.stringify({ name, description: description ?? null }),
+    }),
+
+  deleteList: (id: number) => request<void>(`/lists/${id}`, { method: "DELETE" }),
+
+  listMembers: (id: number) => request<Company[]>(`/lists/${id}/companies`),
+
+  addToList: (listId: number, companyId: number) =>
+    request<CompanyList>(`/lists/${listId}/companies`, {
+      method: "POST",
+      body: JSON.stringify({ company_id: companyId }),
+    }),
+
+  removeFromList: (listId: number, companyId: number) =>
+    request<void>(`/lists/${listId}/companies/${companyId}`, { method: "DELETE" }),
+
+  // --- workspace: tags ---
+  listTags: (companyId: number) => request<CompanyTag[]>(`/companies/${companyId}/tags`),
+
+  addTag: (companyId: number, label: string) =>
+    request<CompanyTag>(`/companies/${companyId}/tags`, {
+      method: "POST",
+      body: JSON.stringify({ label }),
+    }),
+
+  removeTag: (companyId: number, label: string) =>
+    request<void>(`/companies/${companyId}/tags/${encodeURIComponent(label)}`, {
+      method: "DELETE",
+    }),
+
+  // --- export (triggers a file download) ---
+  exportSearch: (body: SearchRequest, format: ExportFormat) =>
+    download(`/export/search?format=${format}`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  exportListMembers: (listId: number, format: ExportFormat) =>
+    download(`/export/lists/${listId}?format=${format}`),
+
+  // --- enrichment queue ---
+  enqueueEnrichment: (body: { company_ids?: number[]; list_id?: number }) =>
+    request<EnqueueResult>("/enrichment/jobs", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  enrichmentQueue: () => request<QueueSummary>("/enrichment/queue"),
+
+  runEnrichment: (maxJobs = 10) =>
+    request<{ processed: number }>(`/enrichment/run?max_jobs=${maxJobs}`, { method: "POST" }),
+
+  // --- lead engine: campaigns + inbox ---
+  listCampaigns: () => request<LeadCampaign[]>("/lead-campaigns"),
+
+  createCampaign: (body: CreateCampaignBody) =>
+    request<LeadCampaign>("/lead-campaigns", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  deleteCampaign: (id: number) => request<void>(`/lead-campaigns/${id}`, { method: "DELETE" }),
+
+  runCampaign: (id: number) =>
+    request<CampaignRunResult>(`/lead-campaigns/${id}/run`, { method: "POST" }),
+
+  runDueCampaigns: () =>
+    request<{ new_leads: number }>("/lead-campaigns/run-due", { method: "POST" }),
+
+  listLeads: (limit = 100, campaignId?: number) =>
+    request<Lead[]>(
+      `/leads?limit=${limit}${campaignId != null ? `&campaign_id=${campaignId}` : ""}`,
+    ),
+
+  // --- auth: current workspace + API keys ---
+  whoami: () => request<Workspace>("/auth/whoami"),
+
+  listApiKeys: () => request<ApiKey[]>("/api-keys"),
+
+  createApiKey: (name: string) =>
+    request<CreatedApiKey>("/api-keys", { method: "POST", body: JSON.stringify({ name }) }),
+
+  revokeApiKey: (id: number) => request<void>(`/api-keys/${id}`, { method: "DELETE" }),
 };

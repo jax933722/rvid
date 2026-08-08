@@ -22,6 +22,13 @@ export interface Company {
   status: string;
   industry: string | null;
   size_bucket: string | null;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  founded_year: number | null;
+  employee_count: number | null;
+  contact_email: string | null;
+  contact_phone: string | null;
   domains: DomainResponse[];
   created_at: string;
   updated_at: string;
@@ -78,7 +85,7 @@ export interface SeoProfile {
   scanned_at: string;
 }
 
-export type FilterOp = "eq" | "in" | "gte" | "lte" | "contains" | "is_true";
+export type FilterOp = "eq" | "in" | "gte" | "lte" | "between" | "contains" | "is_true";
 
 export interface SearchFilter {
   field: string;
@@ -101,6 +108,11 @@ export interface SearchItem {
   primary_domain: string | null;
   industry: string | null;
   country: string | null;
+  state: string | null;
+  city: string | null;
+  size_bucket: string | null;
+  founded_year: number | null;
+  employee_count: number | null;
   seo_score: number | null;
   seo_grade: string | null;
   technologies: string[];
@@ -117,4 +129,143 @@ export interface SearchResult {
   total: number;
   page: number;
   page_size: number;
+}
+
+export interface SavedSearch {
+  id: number;
+  name: string;
+  query: SearchRequest;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CompanyList {
+  id: number;
+  name: string;
+  description: string | null;
+  member_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CompanyTag {
+  id: number;
+  company_id: number;
+  label: string;
+  created_at: string;
+}
+
+export interface Person {
+  id: number | null;
+  company_id: number;
+  name: string;
+  title: string | null;
+  role_category: string;
+  email: string | null;
+  email_status: string; // "published" | "guessed" | "none"
+  source_url: string | null;
+}
+
+export interface Workspace {
+  id: number | null;
+  name: string;
+  slug: string;
+  created_at: string;
+}
+
+export interface ApiKey {
+  id: number | null;
+  workspace_id: number;
+  name: string;
+  prefix: string;
+  revoked: boolean;
+  last_used_at: string | null;
+  created_at: string;
+}
+
+export interface CreatedApiKey {
+  api_key: ApiKey;
+  secret: string;
+}
+
+export interface EnrichmentJob {
+  id: number | null;
+  company_id: number;
+  status: string;
+  attempts: number;
+  error: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  created_at: string;
+}
+
+export interface EnqueueResult {
+  enqueued: number;
+  skipped: number;
+  jobs: EnrichmentJob[];
+}
+
+export interface QueueSummary {
+  counts: Record<string, number>;
+  recent: EnrichmentJob[];
+}
+
+export interface LeadCampaign {
+  id: number | null;
+  name: string;
+  categories: string[];
+  locations: string[];
+  interval_minutes: number;
+  is_active: boolean;
+  auto_enrich: boolean;
+  per_run_limit: number;
+  lead_count: number;
+  grid_size: number;
+  next_category: string;
+  next_location: string;
+  last_run_at: string | null;
+  created_at: string;
+}
+
+export interface CampaignRunResult {
+  campaign_id: number;
+  category: string;
+  location: string;
+  found: number;
+  new_leads: number;
+  enqueued_enrichment: number;
+}
+
+export interface Lead {
+  id: number | null;
+  campaign_id: number;
+  status: string;
+  created_at: string;
+  company: Company;
+}
+
+export interface CreateCampaignBody {
+  name: string;
+  categories: string[];
+  locations: string[];
+  interval_minutes?: number;
+  auto_enrich?: boolean;
+  per_run_limit?: number;
+}
+
+export interface DiscoveredBusiness {
+  name: string;
+  category: string;
+  website: string | null;
+  website_url: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  postal_code: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  source_url: string | null;
+  company_id: number | null;
 }

@@ -14,14 +14,21 @@ from fastapi import FastAPI
 
 from bise import __version__
 from bise.presentation.api.errors import register_exception_handlers
+from bise.presentation.api.middleware import RateLimitMiddleware
 from bise.presentation.api.routers import (
+    auth,
     companies,
     crawlers,
+    discovery,
+    enrichment,
+    export,
     health,
+    leads,
     marketing,
     search,
     seo,
     technologies,
+    workspace,
 )
 
 API_PREFIX = "/api/v1"
@@ -37,16 +44,32 @@ def create_app(container: Container | None = None) -> FastAPI:
         version=__version__,
         description="Searchable index of publicly available business information.",
     )
-    app.state.container = container or Container(settings)
+    active_container = container or Container(settings)
+    app.state.container = active_container
+    # The default workspace is created lazily on first use (see
+    # Container.default_workspace_id), so building the app touches no database.
+
+    if active_container.settings.rate_limit_enabled:
+        app.add_middleware(
+            RateLimitMiddleware,
+            limiter=active_container.rate_limiter(),
+            exempt_paths=frozenset({f"{API_PREFIX}/health"}),
+        )
 
     register_exception_handlers(app)
     app.include_router(health.router, prefix=API_PREFIX)
+    app.include_router(auth.router, prefix=API_PREFIX)
     app.include_router(companies.router, prefix=API_PREFIX)
     app.include_router(crawlers.router, prefix=API_PREFIX)
     app.include_router(technologies.router, prefix=API_PREFIX)
     app.include_router(seo.router, prefix=API_PREFIX)
     app.include_router(search.router, prefix=API_PREFIX)
     app.include_router(marketing.router, prefix=API_PREFIX)
+    app.include_router(discovery.router, prefix=API_PREFIX)
+    app.include_router(workspace.router, prefix=API_PREFIX)
+    app.include_router(export.router, prefix=API_PREFIX)
+    app.include_router(enrichment.router, prefix=API_PREFIX)
+    app.include_router(leads.router, prefix=API_PREFIX)
     return app
 
 

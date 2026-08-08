@@ -39,20 +39,26 @@ class RebuildSearchDocument:
                 if link.technology is not None
             ]
             seo = uow.seo_profiles.get_for_company(company_id)
-            page_types = self._page_types(uow, company)
-            document = self._build(company, technologies, seo, page_types)
+            page_types, page_titles = self._page_signals(uow, company)
+            roles = sorted({p.role_category.value for p in uow.people.list_for_company(company_id)})
+            document = self._build(company, technologies, seo, page_types, page_titles, roles)
 
         # Indexing happens outside the read transaction (own session in the adapter).
         self._search_index.upsert(document)
         logger.info("search.indexed", company_id=company_id, technologies=len(technologies))
 
     @staticmethod
-    def _page_types(uow: UnitOfWork, company: Company) -> set[PageType]:
+    def _page_signals(uow: UnitOfWork, company: Company) -> tuple[set[PageType], list[str]]:
+        """Collect page-type presence and page titles in a single pass over crawled pages."""
         types: set[PageType] = set()
+        titles: list[str] = []
         for domain in company.domains:
             if domain.id is not None:
-                types.update(p.page_type for p in uow.crawled_pages.list_for_domain(domain.id))
-        return types
+                for page in uow.crawled_pages.list_for_domain(domain.id):
+                    types.add(page.page_type)
+                    if page.title:
+                        titles.append(page.title)
+        return types, titles
 
     @staticmethod
     def _build(
@@ -60,23 +66,40 @@ class RebuildSearchDocument:
         technologies: list[str],
         seo: SeoProfile | None,
         page_types: set[PageType],
+        page_titles: list[str],
+        roles: list[str],
     ) -> SearchDocument:
         assert company.id is not None
         primary = company.primary_domain.hostname if company.primary_domain else None
         has_ssl = bool(seo and seo.signals.has_ssl)
         seo_score = seo.score if seo else None
         seo_grade = seo.grade if seo else None
-        text_parts = [company.display_name, company.industry or "", *technologies]
+        # Keyword search covers the company name, industry, detected technologies,
+        # location, and crawled page titles (the highest-signal on-site text).
+        location_parts = [company.city or "", company.state or "", company.country or ""]
+        text_parts = [
+            company.display_name,
+            company.industry or "",
+            *technologies,
+            *location_parts,
+            *page_titles,
+        ]
 
         return SearchDocument(
             company_id=company.id,
             display_name=company.display_name,
             primary_domain=primary,
             industry=company.industry,
+            country=company.country,
+            state=company.state,
+            city=company.city,
             size_bucket=company.size_bucket,
+            founded_year=company.founded_year,
+            employee_count=company.employee_count,
             seo_score=seo_score,
             seo_grade=seo_grade,
             technologies=technologies,
+            roles=roles,
             has_ssl=has_ssl,
             has_contact_page=PageType.CONTACT in page_types,
             has_careers_page=PageType.CAREERS in page_types,

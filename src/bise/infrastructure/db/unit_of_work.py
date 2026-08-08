@@ -7,26 +7,52 @@ from types import TracebackType
 from sqlalchemy.orm import Session, sessionmaker
 
 from bise.application.ports.repositories import (
+    ApiKeyRepository,
+    CompanyListRepository,
     CompanyRepository,
+    CompanyTagRepository,
     CompanyTechnologyRepository,
     CrawledPageRepository,
     CrawlJobRepository,
+    EnrichmentJobRepository,
+    LeadCampaignRepository,
+    LeadRepository,
     MarketingSignalRepository,
+    PersonRepository,
+    SavedSearchRepository,
     SeoProfileRepository,
     TechnologyRepository,
+    WorkspaceRepository,
+)
+from bise.infrastructure.db.repositories.auth_repository import (
+    SqlAlchemyApiKeyRepository,
+    SqlAlchemyWorkspaceRepository,
 )
 from bise.infrastructure.db.repositories.company_repository import SqlAlchemyCompanyRepository
 from bise.infrastructure.db.repositories.crawl_repository import (
     SqlAlchemyCrawledPageRepository,
     SqlAlchemyCrawlJobRepository,
 )
+from bise.infrastructure.db.repositories.enrichment_repository import (
+    SqlAlchemyEnrichmentJobRepository,
+)
+from bise.infrastructure.db.repositories.lead_repository import (
+    SqlAlchemyLeadCampaignRepository,
+    SqlAlchemyLeadRepository,
+)
 from bise.infrastructure.db.repositories.marketing_repository import (
     SqlAlchemyMarketingSignalRepository,
 )
+from bise.infrastructure.db.repositories.person_repository import SqlAlchemyPersonRepository
 from bise.infrastructure.db.repositories.seo_repository import SqlAlchemySeoProfileRepository
 from bise.infrastructure.db.repositories.technology_repository import (
     SqlAlchemyCompanyTechnologyRepository,
     SqlAlchemyTechnologyRepository,
+)
+from bise.infrastructure.db.repositories.workspace_repository import (
+    SqlAlchemyCompanyListRepository,
+    SqlAlchemyCompanyTagRepository,
+    SqlAlchemySavedSearchRepository,
 )
 
 
@@ -48,6 +74,15 @@ class SqlAlchemyUnitOfWork:
         self.company_technologies: CompanyTechnologyRepository
         self.seo_profiles: SeoProfileRepository
         self.marketing_signals: MarketingSignalRepository
+        self.people: PersonRepository
+        self.saved_searches: SavedSearchRepository
+        self.company_lists: CompanyListRepository
+        self.company_tags: CompanyTagRepository
+        self.enrichment_jobs: EnrichmentJobRepository
+        self.workspaces: WorkspaceRepository
+        self.api_keys: ApiKeyRepository
+        self.lead_campaigns: LeadCampaignRepository
+        self.leads: LeadRepository
 
     def __enter__(self) -> SqlAlchemyUnitOfWork:
         self._session = self._session_factory()
@@ -58,6 +93,15 @@ class SqlAlchemyUnitOfWork:
         self.company_technologies = SqlAlchemyCompanyTechnologyRepository(self._session)
         self.seo_profiles = SqlAlchemySeoProfileRepository(self._session)
         self.marketing_signals = SqlAlchemyMarketingSignalRepository(self._session)
+        self.people = SqlAlchemyPersonRepository(self._session)
+        self.saved_searches = SqlAlchemySavedSearchRepository(self._session)
+        self.company_lists = SqlAlchemyCompanyListRepository(self._session)
+        self.company_tags = SqlAlchemyCompanyTagRepository(self._session)
+        self.enrichment_jobs = SqlAlchemyEnrichmentJobRepository(self._session)
+        self.workspaces = SqlAlchemyWorkspaceRepository(self._session)
+        self.api_keys = SqlAlchemyApiKeyRepository(self._session)
+        self.lead_campaigns = SqlAlchemyLeadCampaignRepository(self._session)
+        self.leads = SqlAlchemyLeadRepository(self._session)
         return self
 
     def __exit__(

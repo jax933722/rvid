@@ -60,3 +60,42 @@ def test_paging_bounds() -> None:
 
 def test_empty_text_becomes_none() -> None:
     assert compile_query(SearchQuery(text="   ")).text is None
+
+
+def test_between_compiles_on_number_field() -> None:
+    compiled = compile_query(
+        SearchQuery(filters=(Filter("founded_year", FilterOp.BETWEEN, ("2000", "2020")),))
+    )
+    pred = compiled.predicates[0]
+    assert pred.kind is FieldKind.NUMBER
+    assert pred.op is FilterOp.BETWEEN
+    assert pred.values == ("2000", "2020")
+
+
+def test_between_requires_two_values() -> None:
+    with pytest.raises(ApplicationError, match="exactly two values"):
+        compile_query(SearchQuery(filters=(Filter("employee_count", FilterOp.BETWEEN, ("5",)),)))
+
+
+def test_between_rejects_min_greater_than_max() -> None:
+    with pytest.raises(ApplicationError, match="min <= max"):
+        compile_query(
+            SearchQuery(filters=(Filter("founded_year", FilterOp.BETWEEN, ("2020", "2000")),))
+        )
+
+
+def test_between_not_allowed_on_text_field() -> None:
+    with pytest.raises(ApplicationError, match="not allowed"):
+        compile_query(SearchQuery(filters=(Filter("industry", FilterOp.BETWEEN, ("a", "b")),)))
+
+
+def test_numeric_field_rejects_non_number() -> None:
+    with pytest.raises(ApplicationError, match="numeric value"):
+        compile_query(SearchQuery(filters=(Filter("employee_count", FilterOp.GTE, ("many",)),)))
+
+
+def test_multi_select_industry_via_in() -> None:
+    compiled = compile_query(
+        SearchQuery(filters=(Filter("city", FilterOp.IN, ("Sydney", "Melbourne")),))
+    )
+    assert compiled.predicates[0].values == ("Sydney", "Melbourne")

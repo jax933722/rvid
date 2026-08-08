@@ -62,13 +62,16 @@ class InMemorySearchIndex:
     @staticmethod
     def _predicate(doc: SearchDocument, p: Predicate) -> bool:
         if p.kind is FieldKind.LIST:
-            owned = {t.lower() for t in doc.technologies}
+            source = doc.roles if p.field == "role" else doc.technologies
+            owned = {t.lower() for t in source}
             return any(v.lower() in owned for v in p.values)
 
         value = getattr(doc, p.field)
         if p.kind is FieldKind.NUMBER:
             if value is None:
                 return False
+            if p.op is FilterOp.BETWEEN:
+                return float(p.values[0]) <= float(value) <= float(p.values[1])
             target = float(p.values[0])
             if p.op is FilterOp.GTE:
                 return float(value) >= target
@@ -92,6 +95,11 @@ class InMemorySearchIndex:
             primary_domain=doc.primary_domain,
             industry=doc.industry,
             country=doc.country,
+            state=doc.state,
+            city=doc.city,
+            size_bucket=doc.size_bucket,
+            founded_year=doc.founded_year,
+            employee_count=doc.employee_count,
             seo_score=doc.seo_score,
             seo_grade=doc.seo_grade,
             technologies=list(doc.technologies),
@@ -105,6 +113,8 @@ class InMemorySearchIndex:
             for doc in docs:
                 if field == "technology":
                     counter.update(doc.technologies)
+                elif field == "role":
+                    counter.update(doc.roles)
                 else:
                     value = getattr(doc, field)
                     if value is not None:

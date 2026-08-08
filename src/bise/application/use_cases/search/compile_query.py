@@ -37,12 +37,13 @@ class FieldSpec:
 
 
 _TEXT_OPS = frozenset({FilterOp.EQ, FilterOp.IN})
-_NUMBER_OPS = frozenset({FilterOp.GTE, FilterOp.LTE, FilterOp.EQ})
+_NUMBER_OPS = frozenset({FilterOp.GTE, FilterOp.LTE, FilterOp.EQ, FilterOp.BETWEEN})
 _BOOL_OPS = frozenset({FilterOp.IS_TRUE, FilterOp.EQ})
 _LIST_OPS = frozenset({FilterOp.CONTAINS})
 
 # The closed vocabulary of filterable fields (prevents injection and keeps every
-# adapter implementable). Geo fields are wired for the future Location module.
+# adapter implementable). Text fields accept IN for Sales-Navigator-style
+# multi-select; number fields accept BETWEEN for range inputs.
 FIELD_SPECS: dict[str, FieldSpec] = {
     "industry": FieldSpec(FieldKind.TEXT, _TEXT_OPS),
     "country": FieldSpec(FieldKind.TEXT, _TEXT_OPS),
@@ -51,7 +52,10 @@ FIELD_SPECS: dict[str, FieldSpec] = {
     "size_bucket": FieldSpec(FieldKind.TEXT, _TEXT_OPS),
     "seo_grade": FieldSpec(FieldKind.TEXT, _TEXT_OPS),
     "seo_score": FieldSpec(FieldKind.NUMBER, _NUMBER_OPS),
+    "founded_year": FieldSpec(FieldKind.NUMBER, _NUMBER_OPS),
+    "employee_count": FieldSpec(FieldKind.NUMBER, _NUMBER_OPS),
     "technology": FieldSpec(FieldKind.LIST, _LIST_OPS),
+    "role": FieldSpec(FieldKind.LIST, _LIST_OPS),
     "has_ssl": FieldSpec(FieldKind.BOOL, _BOOL_OPS),
     "has_contact_page": FieldSpec(FieldKind.BOOL, _BOOL_OPS),
     "has_careers_page": FieldSpec(FieldKind.BOOL, _BOOL_OPS),
@@ -98,10 +102,31 @@ def _validate_filter(f: Filter) -> Predicate:
             raise ApplicationError(f"Filter on {f.field!r} requires at least one value")
     elif f.op is FilterOp.IS_TRUE:
         pass
+    elif f.op is FilterOp.BETWEEN:
+        if len(f.values) != 2:
+            raise ApplicationError(
+                f"Operator 'between' on {f.field!r} requires exactly two values (min, max)"
+            )
+        lo, hi = _as_number(f.field, f.values[0]), _as_number(f.field, f.values[1])
+        if lo > hi:
+            raise ApplicationError(f"Range on {f.field!r} requires min <= max")
     elif len(f.values) != 1:
         raise ApplicationError(f"Operator {f.op!r} on {f.field!r} requires exactly one value")
 
+    # Numeric single-value operators must carry a parseable number.
+    if spec.kind is FieldKind.NUMBER and f.op in (FilterOp.GTE, FilterOp.LTE, FilterOp.EQ):
+        _as_number(f.field, f.values[0])
+
     return Predicate(field=f.field, kind=spec.kind, op=f.op, values=tuple(f.values))
+
+
+def _as_number(field: str, value: str) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        raise ApplicationError(
+            f"Filter on {field!r} requires a numeric value, got {value!r}"
+        ) from None
 
 
 def compile_query(query: SearchQuery) -> CompiledQuery:

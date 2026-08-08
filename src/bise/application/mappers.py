@@ -2,17 +2,31 @@
 
 from __future__ import annotations
 
+from bise.application.dto.auth_dto import ApiKeyDTO, WorkspaceDTO
 from bise.application.dto.company_dto import CompanyDTO, DomainDTO
 from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
+from bise.application.dto.enrichment_dto import EnrichmentJobDTO
+from bise.application.dto.lead_dto import LeadCampaignDTO, LeadDTO
 from bise.application.dto.marketing_dto import MarketingSignalDTO
+from bise.application.dto.person_dto import PersonDTO
 from bise.application.dto.seo_dto import SeoProfileDTO
 from bise.application.dto.technology_dto import CompanyTechnologyDTO, TechnologyDTO
+from bise.application.dto.workspace_dto import CompanyListDTO, CompanyTagDTO, SavedSearchDTO
+from bise.domain.entities.api_key import ApiKey
 from bise.domain.entities.company import Company
+from bise.domain.entities.company_list import CompanyList
+from bise.domain.entities.company_tag import CompanyTag
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage
+from bise.domain.entities.enrichment_job import EnrichmentJob
+from bise.domain.entities.lead import Lead
+from bise.domain.entities.lead_campaign import LeadCampaign
 from bise.domain.entities.marketing_signal import MarketingSignal
+from bise.domain.entities.person import Person
+from bise.domain.entities.saved_search import SavedSearch
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology, Technology
+from bise.domain.entities.workspace import Workspace
 
 
 def company_to_dto(company: Company) -> CompanyDTO:
@@ -24,6 +38,13 @@ def company_to_dto(company: Company) -> CompanyDTO:
         status=company.status.value,
         industry=company.industry,
         size_bucket=company.size_bucket,
+        country=company.country,
+        state=company.state,
+        city=company.city,
+        founded_year=company.founded_year,
+        employee_count=company.employee_count,
+        contact_email=company.contact_email,
+        contact_phone=company.contact_phone,
         domains=tuple(
             DomainDTO(
                 id=d.id,
@@ -129,4 +150,118 @@ def company_technology_to_dto(link: CompanyTechnology) -> CompanyTechnologyDTO:
         evidence=link.evidence,
         version=link.version,
         detected_at=link.detected_at,
+    )
+
+
+def saved_search_to_dto(search: SavedSearch) -> SavedSearchDTO:
+    """Convert a :class:`SavedSearch` entity into its boundary DTO."""
+    return SavedSearchDTO(
+        id=search.id,
+        name=search.name,
+        query_json=search.query_json,
+        created_at=search.created_at,
+        updated_at=search.updated_at,
+    )
+
+
+def company_list_to_dto(company_list: CompanyList) -> CompanyListDTO:
+    """Convert a :class:`CompanyList` entity into its boundary DTO."""
+    return CompanyListDTO(
+        id=company_list.id,
+        name=company_list.name,
+        description=company_list.description,
+        member_count=company_list.member_count,
+        created_at=company_list.created_at,
+        updated_at=company_list.updated_at,
+    )
+
+
+def company_tag_to_dto(tag: CompanyTag) -> CompanyTagDTO:
+    """Convert a :class:`CompanyTag` entity into its boundary DTO."""
+    return CompanyTagDTO(
+        id=tag.id,
+        company_id=tag.company_id,
+        label=tag.label,
+        created_at=tag.created_at,
+    )
+
+
+def enrichment_job_to_dto(job: EnrichmentJob) -> EnrichmentJobDTO:
+    """Convert an :class:`EnrichmentJob` entity into its boundary DTO."""
+    return EnrichmentJobDTO(
+        id=job.id,
+        company_id=job.company_id,
+        status=job.status.value,
+        attempts=job.attempts,
+        error=job.error,
+        started_at=job.started_at,
+        finished_at=job.finished_at,
+        created_at=job.created_at,
+    )
+
+
+def workspace_to_dto(workspace: Workspace) -> WorkspaceDTO:
+    """Convert a :class:`Workspace` entity into its boundary DTO."""
+    return WorkspaceDTO(
+        id=workspace.id,
+        name=workspace.name,
+        slug=workspace.slug,
+        created_at=workspace.created_at,
+    )
+
+
+def api_key_to_dto(api_key: ApiKey) -> ApiKeyDTO:
+    """Convert an :class:`ApiKey` entity into its boundary DTO (no secret)."""
+    return ApiKeyDTO(
+        id=api_key.id,
+        workspace_id=api_key.workspace_id,
+        name=api_key.name,
+        prefix=api_key.prefix,
+        revoked=api_key.revoked,
+        last_used_at=api_key.last_used_at,
+        created_at=api_key.created_at,
+    )
+
+
+def person_to_dto(person: Person) -> PersonDTO:
+    """Convert a :class:`Person` entity into its boundary DTO."""
+    return PersonDTO(
+        id=person.id,
+        company_id=person.company_id,
+        name=person.name,
+        title=person.title,
+        role_category=person.role_category.value,
+        email=person.email,
+        email_status=person.email_status.value,
+        source_url=person.source_url,
+    )
+
+
+def lead_campaign_to_dto(campaign: LeadCampaign, lead_count: int) -> LeadCampaignDTO:
+    """Convert a :class:`LeadCampaign` entity (plus its lead count) into a DTO."""
+    return LeadCampaignDTO(
+        id=campaign.id,
+        name=campaign.name,
+        categories=tuple(campaign.categories),
+        locations=tuple(campaign.locations),
+        interval_minutes=campaign.interval_minutes,
+        is_active=campaign.is_active,
+        auto_enrich=campaign.auto_enrich,
+        per_run_limit=campaign.per_run_limit,
+        lead_count=lead_count,
+        grid_size=campaign.grid_size,
+        next_target=campaign.current_target(),
+        last_run_at=campaign.last_run_at,
+        created_at=campaign.created_at,
+    )
+
+
+def lead_to_dto(lead: Lead, company: Company) -> LeadDTO:
+    """Convert a :class:`Lead` (with its company) into a boundary DTO."""
+    return LeadDTO(
+        id=lead.id,
+        campaign_id=lead.campaign_id,
+        status=lead.status.value,
+        created_at=lead.created_at,
+        company=company_to_dto(company),
     )

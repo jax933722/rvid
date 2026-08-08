@@ -26,6 +26,7 @@ from bise.application.dto.company_dto import CreateCompanyCommand, NewDomainDTO
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage, PageType
 from bise.domain.entities.marketing_signal import MarketingSignal
+from bise.domain.entities.person import EmailStatus, Person, RoleCategory
 from bise.domain.entities.seo_profile import SeoProfile
 from bise.domain.entities.technology import CompanyTechnology
 from bise.domain.value_objects.confidence import Confidence
@@ -42,6 +43,11 @@ class Demo:
     seo_score: float
     pages: list[PageType]
     marketing: list[tuple[str, str]]  # (tool, category)
+    city: str
+    state: str
+    country: str
+    founded_year: int
+    employee_count: int
 
 
 DEMOS = [
@@ -58,6 +64,11 @@ DEMOS = [
         42.0,
         [PageType.CONTACT, PageType.CAREERS],
         [("Meta Pixel", "Marketing Pixel"), ("WhatsApp", "Messaging")],
+        city="Sydney",
+        state="NSW",
+        country="Australia",
+        founded_year=2008,
+        employee_count=24,
     ),
     Demo(
         "BrightSmile Orthodontics",
@@ -68,6 +79,11 @@ DEMOS = [
         88.0,
         [PageType.CONTACT, PageType.BLOG],
         [("Google Tag Manager", "Tag Manager"), ("Calendly", "Appointment Booking")],
+        city="Melbourne",
+        state="VIC",
+        country="Australia",
+        founded_year=2016,
+        employee_count=8,
     ),
     Demo(
         "Coastal Plumbing",
@@ -78,6 +94,11 @@ DEMOS = [
         71.0,
         [PageType.CONTACT],
         [("Mailchimp", "Lead / Newsletter Form")],
+        city="Gold Coast",
+        state="QLD",
+        country="Australia",
+        founded_year=2011,
+        employee_count=33,
     ),
     Demo(
         "Nimbus Software",
@@ -92,6 +113,11 @@ DEMOS = [
         93.0,
         [PageType.CAREERS, PageType.BLOG],
         [("Google Analytics 4", "Analytics"), ("Intercom", "Chat / Widget")],
+        city="Sydney",
+        state="NSW",
+        country="Australia",
+        founded_year=2019,
+        employee_count=140,
     ),
     Demo(
         "GreenLeaf Cafe",
@@ -102,6 +128,11 @@ DEMOS = [
         56.0,
         [PageType.CONTACT],
         [("OneTrust", "Cookie / Consent")],
+        city="Perth",
+        state="WA",
+        country="Australia",
+        founded_year=2014,
+        employee_count=6,
     ),
     Demo(
         "Urban Fitness",
@@ -112,8 +143,37 @@ DEMOS = [
         64.0,
         [PageType.CONTACT, PageType.CAREERS],
         [("Meta Pixel", "Marketing Pixel"), ("TikTok Pixel", "Marketing Pixel")],
+        city="Brisbane",
+        state="QLD",
+        country="Australia",
+        founded_year=2017,
+        employee_count=45,
     ),
 ]
+
+
+def _people(company_id: int, host: str) -> list[Person]:
+    """A small, deterministic leadership team for demo/screenshot purposes."""
+    return [
+        Person(
+            company_id=company_id,
+            name="Jordan Avery",
+            title="Founder & CEO",
+            role_category=RoleCategory.FOUNDER,
+            email=f"jordan.avery@{host}",
+            email_status=EmailStatus.PUBLISHED,
+            source_url=f"https://{host}/about",
+        ),
+        Person(
+            company_id=company_id,
+            name="Sam Rivera",
+            title="Chief Technology Officer",
+            role_category=RoleCategory.CTO,
+            email=f"sam.rivera@{host}",
+            email_status=EmailStatus.GUESSED,
+            source_url=f"https://{host}/about",
+        ),
+    ]
 
 
 def _seo_signals(host: str, score: float) -> SeoSignals:
@@ -147,6 +207,11 @@ def seed() -> None:
                 display_name=demo.name,
                 industry=demo.industry,
                 size_bucket=demo.size,
+                city=demo.city,
+                state=demo.state,
+                country=demo.country,
+                founded_year=demo.founded_year,
+                employee_count=demo.employee_count,
                 domains=(NewDomainDTO(hostname=demo.host, is_primary=True),),
             )
         )
@@ -205,6 +270,7 @@ def seed() -> None:
                     for name, cat in demo.marketing
                 ],
             )
+            uow.people.replace_for_company(company_id, _people(company_id, demo.host))
             uow.commit()
 
         settings_container.rebuild_search_document().execute(company_id)

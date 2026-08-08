@@ -37,6 +37,15 @@ class Company:
     status: CompanyStatus = CompanyStatus.DISCOVERED
     industry: str | None = None
     size_bucket: str | None = None
+    # Firmographics — sourced only from public/open data (OpenStreetMap, the
+    # company's own website). Fields we cannot source for free stay ``None``.
+    country: str | None = None
+    state: str | None = None
+    city: str | None = None
+    founded_year: int | None = None
+    employee_count: int | None = None
+    contact_email: str | None = None
+    contact_phone: str | None = None
     domains: list[WebsiteDomain] = field(default_factory=list)
     id: int | None = field(default=None)
     created_at: datetime = field(default_factory=_utcnow)
@@ -46,6 +55,13 @@ class Company:
         if not self.display_name or not self.display_name.strip():
             raise InvalidValueError("Company.display_name must be a non-empty string")
         self.display_name = self.display_name.strip()
+        if self.founded_year is not None and not (1800 <= self.founded_year <= _utcnow().year + 1):
+            raise InvalidValueError(
+                f"Company.founded_year out of range (1800..{_utcnow().year + 1}): "
+                f"{self.founded_year}"
+            )
+        if self.employee_count is not None and self.employee_count < 0:
+            raise InvalidValueError("Company.employee_count must be non-negative")
 
     def add_domain(self, domain: WebsiteDomain) -> None:
         """Attach a website domain, enforcing hostname uniqueness and a single primary."""

@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { api } from "@/api/client";
 import { Badge, Card, gradeTone, Spinner } from "@/components/ui";
+import { PeopleList } from "@/features/people/PeopleList";
+import { CompanyWorkspacePanel } from "@/features/workspace/CompanyWorkspacePanel";
 
 export function CompanyPreview({ companyId }: { companyId: number | null }) {
   const company = useQuery({
@@ -26,6 +28,16 @@ export function CompanyPreview({ companyId }: { companyId: number | null }) {
   if (!company.data) return <div className="p-6 text-sm text-red-500">Failed to load.</div>;
 
   const c = company.data;
+  const place = [c.city, c.state, c.country].filter(Boolean).join(", ");
+  const facts = [
+    place ? { label: "Location", value: place } : null,
+    c.founded_year != null ? { label: "Founded", value: String(c.founded_year) } : null,
+    c.employee_count != null ? { label: "Employees", value: String(c.employee_count) } : null,
+    c.size_bucket ? { label: "Size", value: c.size_bucket } : null,
+    c.contact_phone ? { label: "Phone", value: c.contact_phone } : null,
+    c.contact_email ? { label: "Email", value: c.contact_email } : null,
+  ].filter((f): f is { label: string; value: string } => f !== null);
+
   return (
     <div className="space-y-3">
       <div>
@@ -40,6 +52,16 @@ export function CompanyPreview({ companyId }: { companyId: number | null }) {
           </Badge>
         ))}
       </div>
+      {facts.length > 0 && (
+        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+          {facts.map((f) => (
+            <div key={f.label} className="contents">
+              <dt className="text-slate-400">{f.label}</dt>
+              <dd className="truncate">{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {seo.data && (
         <Card>
           <div className="flex items-center justify-between">
@@ -54,6 +76,10 @@ export function CompanyPreview({ companyId }: { companyId: number | null }) {
           </div>
         </Card>
       )}
+      <PeopleList companyId={companyId} />
+
+      <CompanyWorkspacePanel companyId={companyId} />
+
       <Link
         to={`/companies/${companyId}`}
         className="inline-block rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700"

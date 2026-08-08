@@ -4,6 +4,7 @@ import { api } from "@/api/client";
 import { ApiError } from "@/api/client";
 import { Badge, Button, Card, Spinner } from "@/components/ui";
 import type { CrawlJob } from "@/api/types";
+import { EnrichmentQueuePanel } from "@/features/enrichment/EnrichmentQueuePanel";
 
 function statusTone(status: string): string {
   return { completed: "green", running: "amber", pending: "slate", failed: "red" }[status] ?? "slate";
@@ -33,6 +34,8 @@ export function CrawlerMonitorPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Crawler Monitor</h1>
+
+      <EnrichmentQueuePanel />
 
       <Card>
         <form

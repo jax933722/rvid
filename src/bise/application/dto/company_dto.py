@@ -27,6 +27,13 @@ class CreateCompanyCommand:
     legal_name: str | None = None
     industry: str | None = None
     size_bucket: str | None = None
+    country: str | None = None
+    state: str | None = None
+    city: str | None = None
+    founded_year: int | None = None
+    employee_count: int | None = None
+    contact_email: str | None = None
+    contact_phone: str | None = None
     domains: tuple[NewDomainDTO, ...] = ()
 
 
@@ -50,6 +57,13 @@ class CompanyDTO:
     status: str
     industry: str | None
     size_bucket: str | None
+    country: str | None
+    state: str | None
+    city: str | None
+    founded_year: int | None
+    employee_count: int | None
+    contact_email: str | None
+    contact_phone: str | None
     domains: tuple[DomainDTO, ...]
     created_at: datetime
     updated_at: datetime
