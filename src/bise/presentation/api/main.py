@@ -23,6 +23,7 @@ from bise.presentation.api.routers import (
     enrichment,
     export,
     health,
+    leads,
     marketing,
     search,
     seo,
@@ -68,6 +69,7 @@ def create_app(container: Container | None = None) -> FastAPI:
     app.include_router(workspace.router, prefix=API_PREFIX)
     app.include_router(export.router, prefix=API_PREFIX)
     app.include_router(enrichment.router, prefix=API_PREFIX)
+    app.include_router(leads.router, prefix=API_PREFIX)
     return app
 
 

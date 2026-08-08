@@ -18,6 +18,8 @@ from bise.application.ports.repositories import (
     CrawledPageRepository,
     CrawlJobRepository,
     EnrichmentJobRepository,
+    LeadCampaignRepository,
+    LeadRepository,
     MarketingSignalRepository,
     PersonRepository,
     SavedSearchRepository,
@@ -44,6 +46,8 @@ class UnitOfWork(Protocol):
     enrichment_jobs: EnrichmentJobRepository
     workspaces: WorkspaceRepository
     api_keys: ApiKeyRepository
+    lead_campaigns: LeadCampaignRepository
+    leads: LeadRepository
 
     def __enter__(self) -> UnitOfWork: ...
 

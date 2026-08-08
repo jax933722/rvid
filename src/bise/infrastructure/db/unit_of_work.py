@@ -15,6 +15,8 @@ from bise.application.ports.repositories import (
     CrawledPageRepository,
     CrawlJobRepository,
     EnrichmentJobRepository,
+    LeadCampaignRepository,
+    LeadRepository,
     MarketingSignalRepository,
     PersonRepository,
     SavedSearchRepository,
@@ -33,6 +35,10 @@ from bise.infrastructure.db.repositories.crawl_repository import (
 )
 from bise.infrastructure.db.repositories.enrichment_repository import (
     SqlAlchemyEnrichmentJobRepository,
+)
+from bise.infrastructure.db.repositories.lead_repository import (
+    SqlAlchemyLeadCampaignRepository,
+    SqlAlchemyLeadRepository,
 )
 from bise.infrastructure.db.repositories.marketing_repository import (
     SqlAlchemyMarketingSignalRepository,
@@ -75,6 +81,8 @@ class SqlAlchemyUnitOfWork:
         self.enrichment_jobs: EnrichmentJobRepository
         self.workspaces: WorkspaceRepository
         self.api_keys: ApiKeyRepository
+        self.lead_campaigns: LeadCampaignRepository
+        self.leads: LeadRepository
 
     def __enter__(self) -> SqlAlchemyUnitOfWork:
         self._session = self._session_factory()
@@ -92,6 +100,8 @@ class SqlAlchemyUnitOfWork:
         self.enrichment_jobs = SqlAlchemyEnrichmentJobRepository(self._session)
         self.workspaces = SqlAlchemyWorkspaceRepository(self._session)
         self.api_keys = SqlAlchemyApiKeyRepository(self._session)
+        self.lead_campaigns = SqlAlchemyLeadCampaignRepository(self._session)
+        self.leads = SqlAlchemyLeadRepository(self._session)
         return self
 
     def __exit__(

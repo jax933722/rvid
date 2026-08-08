@@ -30,6 +30,13 @@ from bise.application.use_cases.enrichment.list_company_people import ListCompan
 from bise.application.use_cases.enrichment.list_company_technologies import ListCompanyTechnologies
 from bise.application.use_cases.enrichment.list_technologies import ListTechnologies
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
+from bise.application.use_cases.leads.list_leads import ListLeads
+from bise.application.use_cases.leads.manage_campaigns import (
+    CreateLeadCampaign,
+    DeleteLeadCampaign,
+    ListLeadCampaigns,
+)
+from bise.application.use_cases.leads.run_lead_campaign import RunLeadCampaign
 from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
 from bise.application.use_cases.search.search_companies import SearchCompanies
 from bise.application.use_cases.workspace.lists import (
@@ -213,6 +220,26 @@ def get_enqueue_enrichment(container: ContainerDep) -> EnqueueEnrichment:
 
 def get_queue_summary(container: ContainerDep) -> GetQueueSummary:
     return container.get_queue_summary()
+
+
+def get_create_lead_campaign(container: ContainerDep) -> CreateLeadCampaign:
+    return container.create_lead_campaign()
+
+
+def get_list_lead_campaigns(container: ContainerDep) -> ListLeadCampaigns:
+    return container.list_lead_campaigns()
+
+
+def get_delete_lead_campaign(container: ContainerDep) -> DeleteLeadCampaign:
+    return container.delete_lead_campaign()
+
+
+def get_run_lead_campaign(container: ContainerDep) -> RunLeadCampaign:
+    return container.run_lead_campaign()
+
+
+def get_list_leads(container: ContainerDep) -> ListLeads:
+    return container.list_leads()
 
 
 def get_create_workspace(container: ContainerDep) -> CreateWorkspace:

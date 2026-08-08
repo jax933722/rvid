@@ -8,6 +8,7 @@ makes persistence swappable and use cases unit-testable with in-memory fakes.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from datetime import datetime
 from typing import Protocol
 
 from bise.domain.entities.api_key import ApiKey
@@ -17,6 +18,8 @@ from bise.domain.entities.company_tag import CompanyTag
 from bise.domain.entities.crawl_job import CrawlJob, CrawlJobStatus
 from bise.domain.entities.crawled_page import CrawledPage
 from bise.domain.entities.enrichment_job import EnrichmentJob, EnrichmentJobStatus
+from bise.domain.entities.lead import Lead
+from bise.domain.entities.lead_campaign import LeadCampaign
 from bise.domain.entities.marketing_signal import MarketingSignal
 from bise.domain.entities.person import Person
 from bise.domain.entities.saved_search import SavedSearch
@@ -184,6 +187,56 @@ class CompanyListRepository(Protocol):
 
     def list_members(self, list_id: int) -> Sequence[Company]:
         """Return the companies in a list, newest membership first."""
+        ...
+
+
+class LeadCampaignRepository(Protocol):
+    """Persistence for recurring lead-generation campaigns."""
+
+    def add(self, campaign: LeadCampaign) -> LeadCampaign:
+        """Persist a new campaign and return it with its assigned id."""
+        ...
+
+    def get(self, campaign_id: int) -> LeadCampaign | None:
+        """Return the campaign with the given id, or ``None``."""
+        ...
+
+    def update(self, campaign: LeadCampaign) -> None:
+        """Persist changes (cursor, last_run_at, active flag, …)."""
+        ...
+
+    def list(self) -> Sequence[LeadCampaign]:
+        """Return all campaigns, newest first."""
+        ...
+
+    def list_due(self, now: datetime) -> Sequence[LeadCampaign]:
+        """Return active campaigns whose interval has elapsed."""
+        ...
+
+    def delete(self, campaign_id: int) -> bool:
+        """Delete a campaign and its leads; ``True`` if a row was removed."""
+        ...
+
+
+class LeadRepository(Protocol):
+    """Persistence for leads (campaign↔company) with dedup + inbox reads."""
+
+    def exists(self, campaign_id: int, company_id: int) -> bool:
+        """Whether this company is already a lead for this campaign (dedup guard)."""
+        ...
+
+    def add(self, lead: Lead) -> Lead:
+        """Persist a new lead and return it with its assigned id."""
+        ...
+
+    def count_for_campaign(self, campaign_id: int) -> int:
+        """Total leads accumulated by a campaign."""
+        ...
+
+    def list_recent(
+        self, limit: int, campaign_id: int | None = None
+    ) -> Sequence[tuple[Lead, Company]]:
+        """Return recent leads with their company, newest first (the inbox)."""
         ...
 
 

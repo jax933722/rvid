@@ -49,6 +49,13 @@ from bise.application.use_cases.enrichment.list_technologies import ListTechnolo
 from bise.application.use_cases.enrichment.run_seo_scan import RunSeoScan
 from bise.application.use_cases.export.export_list import ExportListMembers
 from bise.application.use_cases.export.export_search import ExportSearchResults
+from bise.application.use_cases.leads.list_leads import ListLeads
+from bise.application.use_cases.leads.manage_campaigns import (
+    CreateLeadCampaign,
+    DeleteLeadCampaign,
+    ListLeadCampaigns,
+)
+from bise.application.use_cases.leads.run_lead_campaign import RunLeadCampaign
 from bise.application.use_cases.search.rebuild_search_document import RebuildSearchDocument
 from bise.application.use_cases.search.search_companies import SearchCompanies
 from bise.application.use_cases.workspace.lists import (
@@ -317,3 +324,19 @@ class Container:
 
     def get_queue_summary(self) -> GetQueueSummary:
         return GetQueueSummary(self.unit_of_work())
+
+    # --- Lead engine: continuous campaigns + lead inbox ---
+    def create_lead_campaign(self) -> CreateLeadCampaign:
+        return CreateLeadCampaign(self.unit_of_work())
+
+    def list_lead_campaigns(self) -> ListLeadCampaigns:
+        return ListLeadCampaigns(self.unit_of_work())
+
+    def delete_lead_campaign(self) -> DeleteLeadCampaign:
+        return DeleteLeadCampaign(self.unit_of_work())
+
+    def run_lead_campaign(self) -> RunLeadCampaign:
+        return RunLeadCampaign(self.unit_of_work(), self.discovery_source())
+
+    def list_leads(self) -> ListLeads:
+        return ListLeads(self.unit_of_work())

@@ -6,6 +6,7 @@ from bise.application.dto.auth_dto import ApiKeyDTO, WorkspaceDTO
 from bise.application.dto.company_dto import CompanyDTO, DomainDTO
 from bise.application.dto.crawl_dto import CrawledPageDTO, CrawlJobDTO
 from bise.application.dto.enrichment_dto import EnrichmentJobDTO
+from bise.application.dto.lead_dto import LeadCampaignDTO, LeadDTO
 from bise.application.dto.marketing_dto import MarketingSignalDTO
 from bise.application.dto.person_dto import PersonDTO
 from bise.application.dto.seo_dto import SeoProfileDTO
@@ -18,6 +19,8 @@ from bise.domain.entities.company_tag import CompanyTag
 from bise.domain.entities.crawl_job import CrawlJob
 from bise.domain.entities.crawled_page import CrawledPage
 from bise.domain.entities.enrichment_job import EnrichmentJob
+from bise.domain.entities.lead import Lead
+from bise.domain.entities.lead_campaign import LeadCampaign
 from bise.domain.entities.marketing_signal import MarketingSignal
 from bise.domain.entities.person import Person
 from bise.domain.entities.saved_search import SavedSearch
@@ -231,4 +234,34 @@ def person_to_dto(person: Person) -> PersonDTO:
         email=person.email,
         email_status=person.email_status.value,
         source_url=person.source_url,
+    )
+
+
+def lead_campaign_to_dto(campaign: LeadCampaign, lead_count: int) -> LeadCampaignDTO:
+    """Convert a :class:`LeadCampaign` entity (plus its lead count) into a DTO."""
+    return LeadCampaignDTO(
+        id=campaign.id,
+        name=campaign.name,
+        categories=tuple(campaign.categories),
+        locations=tuple(campaign.locations),
+        interval_minutes=campaign.interval_minutes,
+        is_active=campaign.is_active,
+        auto_enrich=campaign.auto_enrich,
+        per_run_limit=campaign.per_run_limit,
+        lead_count=lead_count,
+        grid_size=campaign.grid_size,
+        next_target=campaign.current_target(),
+        last_run_at=campaign.last_run_at,
+        created_at=campaign.created_at,
+    )
+
+
+def lead_to_dto(lead: Lead, company: Company) -> LeadDTO:
+    """Convert a :class:`Lead` (with its company) into a boundary DTO."""
+    return LeadDTO(
+        id=lead.id,
+        campaign_id=lead.campaign_id,
+        status=lead.status.value,
+        created_at=lead.created_at,
+        company=company_to_dto(company),
     )
