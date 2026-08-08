@@ -210,6 +210,49 @@ export interface QueueSummary {
   recent: EnrichmentJob[];
 }
 
+export interface LeadCampaign {
+  id: number | null;
+  name: string;
+  categories: string[];
+  locations: string[];
+  interval_minutes: number;
+  is_active: boolean;
+  auto_enrich: boolean;
+  per_run_limit: number;
+  lead_count: number;
+  grid_size: number;
+  next_category: string;
+  next_location: string;
+  last_run_at: string | null;
+  created_at: string;
+}
+
+export interface CampaignRunResult {
+  campaign_id: number;
+  category: string;
+  location: string;
+  found: number;
+  new_leads: number;
+  enqueued_enrichment: number;
+}
+
+export interface Lead {
+  id: number | null;
+  campaign_id: number;
+  status: string;
+  created_at: string;
+  company: Company;
+}
+
+export interface CreateCampaignBody {
+  name: string;
+  categories: string[];
+  locations: string[];
+  interval_minutes?: number;
+  auto_enrich?: boolean;
+  per_run_limit?: number;
+}
+
 export interface DiscoveredBusiness {
   name: string;
   category: string;

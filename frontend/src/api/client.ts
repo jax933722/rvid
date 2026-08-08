@@ -2,14 +2,18 @@
 
 import type {
   ApiKey,
+  CampaignRunResult,
   Company,
   CompanyList,
   CompanyTag,
   CompanyTechnology,
   CrawlJob,
+  CreateCampaignBody,
   CreatedApiKey,
   DiscoveredBusiness,
   EnqueueResult,
+  Lead,
+  LeadCampaign,
   Page,
   Person,
   QueueSummary,
@@ -184,6 +188,28 @@ export const api = {
 
   runEnrichment: (maxJobs = 10) =>
     request<{ processed: number }>(`/enrichment/run?max_jobs=${maxJobs}`, { method: "POST" }),
+
+  // --- lead engine: campaigns + inbox ---
+  listCampaigns: () => request<LeadCampaign[]>("/lead-campaigns"),
+
+  createCampaign: (body: CreateCampaignBody) =>
+    request<LeadCampaign>("/lead-campaigns", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  deleteCampaign: (id: number) => request<void>(`/lead-campaigns/${id}`, { method: "DELETE" }),
+
+  runCampaign: (id: number) =>
+    request<CampaignRunResult>(`/lead-campaigns/${id}/run`, { method: "POST" }),
+
+  runDueCampaigns: () =>
+    request<{ new_leads: number }>("/lead-campaigns/run-due", { method: "POST" }),
+
+  listLeads: (limit = 100, campaignId?: number) =>
+    request<Lead[]>(
+      `/leads?limit=${limit}${campaignId != null ? `&campaign_id=${campaignId}` : ""}`,
+    ),
 
   // --- auth: current workspace + API keys ---
   whoami: () => request<Workspace>("/auth/whoami"),

@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "@/components/Layout";
+import { CampaignsPage } from "@/pages/Campaigns";
 import { CompanyDetailsPage } from "@/pages/CompanyDetails";
 import { CrawlerMonitorPage } from "@/pages/CrawlerMonitor";
 import { DashboardPage } from "@/pages/Dashboard";
@@ -14,6 +15,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/discover" element={<DiscoverPage />} />
+        <Route path="/campaigns" element={<CampaignsPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/lists" element={<ListsPage />} />
         <Route path="/companies/:id" element={<CompanyDetailsPage />} />
