@@ -41,8 +41,8 @@ rvid/
 ├── src/bise/        backend (FastAPI + SQLAlchemy, Clean Architecture)
 ├── config/          settings, logging, DI composition root
 ├── frontend/        React + Vite + TypeScript + Tailwind SPA
-├── scripts/         seed_demo.py (demo data)
-└── tests/           157+ tests
+├── scripts/         seed_demo.py · enrichment_worker.py · lead_engine.py
+└── tests/           312 tests
 ```
 
 ---
@@ -127,7 +127,48 @@ and in Search. Try:
 
 ---
 
-## 5. Crawl a real website (optional)
+## 5. Keep leads coming — the Lead Engine (optional)
+
+The **Lead Engine** turns discovery into a continuous flow of *net-new* leads.
+A campaign describes your ideal customer as **business types × locations**; a
+rotation cursor sweeps that grid one cell per run, and only businesses you've
+never seen become leads.
+
+1. In the UI, open **Lead Engine** (left nav) and create a campaign — e.g.
+   business types `dentist, cafe`, locations `Sydney, Melbourne`. Tick
+   **Auto-enrich** to queue each new lead for enrichment.
+2. Click **Run now** on a campaign (or **Run all due**) to fire a cycle. New
+   companies land in the **lead inbox** below, freshest first; download them as
+   CSV anytime.
+3. For hands-off operation, run the scheduler in its own terminal — it runs each
+   due campaign on a loop against the same database:
+
+   ```bash
+   # from repo root, venv active
+   python scripts/lead_engine.py             # run due campaigns forever
+   python scripts/lead_engine.py --once      # run everything due once, then exit
+   ```
+
+> Discovery uses **OpenStreetMap** (Overpass/Nominatim) — free, no key. If a run
+> finds nothing, try a broader location string (e.g. `Sydney, Australia`).
+
+### Background enrichment worker (optional)
+
+Enrichment (crawl → detect tech/marketing → SEO → people → index) runs as a
+background job queue. Drain it in-app from the **Enrichment** UI, or run the
+worker as a separate process:
+
+```bash
+python scripts/enrichment_worker.py          # drain the queue, then poll
+python scripts/enrichment_worker.py --once    # drain once and exit
+```
+
+Both workers share the API's database (`BISE_DATABASE_URL`), so jobs and
+campaigns created in the UI are picked up automatically.
+
+---
+
+## 6. Crawl a real website (optional)
 
 The demo data is seeded directly. To crawl a live site end-to-end:
 
@@ -155,11 +196,11 @@ The demo data is seeded directly. To crawl a live site end-to-end:
 
 ---
 
-## 6. Run the tests (optional)
+## 7. Run the tests (optional)
 
 ```bash
 # backend (from repo root, venv active)
-pytest                       # 157+ tests, all against in-memory SQLite
+pytest                       # 312 tests, all against in-memory SQLite
 make check                   # lint + type-check + architecture rule + coverage gate
 
 # frontend
@@ -168,7 +209,7 @@ cd frontend && npm run typecheck && npm run build
 
 ---
 
-## 7. Reset / clean up
+## 8. Reset / clean up
 
 ```bash
 rm bise.db                   # delete the local database (re-run alembic + seed to recreate)
@@ -198,5 +239,24 @@ Stop the servers with `Ctrl+C` in each terminal.
 | Backend API | http://localhost:8000 | `uvicorn bise.presentation.api.main:app --reload` |
 | API docs (Swagger) | http://localhost:8000/docs | (served by the backend) |
 | Frontend SPA | http://localhost:5173 | `npm run dev` (in `frontend/`) |
+| Lead Engine scheduler | (background) | `python scripts/lead_engine.py` |
+| Enrichment worker | (background) | `python scripts/enrichment_worker.py` |
 
 Everything is open-source and local — no paid APIs, no external services.
+
+---
+
+## Optional configuration (`BISE_*` env vars)
+
+No `.env` is needed for local use. To customize, copy `.env.example` to `.env`.
+Highlights:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `BISE_DATABASE_URL` | `sqlite:///./bise.db` | SQLite (dev) or PostgreSQL (prod) — one swap seam |
+| `BISE_AUTH_ENABLED` | `false` | Require an API key (`Authorization: Bearer …`) when true |
+| `BISE_RATE_LIMIT_ENABLED` / `_PER_MINUTE` / `_BURST` | `true` / `300` / `300` | Per-key/IP token bucket |
+| `BISE_CACHE_ENABLED` / `_TTL_SECONDS` | `true` / `30` | Search response cache |
+
+Auth is **off by default**, so local use needs no key; when you flip it on, mint
+keys from **Settings → API keys** in the UI (the secret is shown once).
